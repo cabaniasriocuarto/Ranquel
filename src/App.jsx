@@ -11,6 +11,7 @@ import React, { useState, useEffect } from 'react';
    ===================== */
 function SecurityLayer() {
   useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
     const csp = [
       "default-src 'self'",
       "img-src 'self' data: https:",
@@ -34,25 +35,50 @@ function SecurityLayer() {
     m3.name = 'color-scheme';
     m3.content = 'dark';
 
-    const prev = document.querySelector("meta[http-equiv='Content-Security-Policy']");
-    if (prev) prev.remove();
+    Array.from(
+      document.querySelectorAll("meta[http-equiv='Content-Security-Policy']")
+    ).forEach((meta) => meta.remove());
     document.head.append(m1, m2, m3);
 
     // Enlaces externos seguros
     const anchors = Array.from(document.querySelectorAll("a[href^='http']"));
+    const previousRel = new Map();
     anchors.forEach((a) => {
-      const rel = (a.getAttribute('rel') || '').split(' ').filter(Boolean);
+      const current = a.getAttribute('rel');
+      previousRel.set(a, current);
+      const rel = (current || '').split(' ').filter(Boolean);
       if (!rel.includes('noopener')) rel.push('noopener');
       if (!rel.includes('noreferrer')) rel.push('noreferrer');
       a.setAttribute('rel', rel.join(' '));
     });
 
     // Bloquear eval()
+    const previousEval = window.eval;
+    const blockEval = function () {
+      throw new Error('eval() bloqueado');
+    };
     try {
-      window.eval = function () {
-        throw new Error('eval() bloqueado');
-      };
+      window.eval = blockEval;
     } catch {}
+
+    return () => {
+      [m1, m2, m3].forEach((meta) => {
+        if (meta.parentNode) {
+          meta.parentNode.removeChild(meta);
+        }
+      });
+      anchors.forEach((a) => {
+        const rel = previousRel.get(a);
+        if (typeof rel === 'string') {
+          a.setAttribute('rel', rel);
+        } else {
+          a.removeAttribute('rel');
+        }
+      });
+      try {
+        window.eval = previousEval;
+      } catch {}
+    };
   }, []);
   return null;
 }
