@@ -9,21 +9,24 @@ import React, { useState, useEffect } from 'react';
 /* =====================
    0) Capa de Seguridad (headers/meta + runtime)
    ===================== */
+const isDev = typeof import.meta !== 'undefined' && import.meta?.env?.DEV;
+
 function SecurityLayer() {
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
-    const csp = [
+    const directives = [
       "default-src 'self'",
       "img-src 'self' data: https:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self'",
-      "connect-src 'self' https://wa.me https://api.whatsapp.com",
+      `script-src 'self'${isDev ? " 'unsafe-eval'" : ''}`,
+      `connect-src 'self' https://wa.me https://api.whatsapp.com${isDev ? ' ws: wss:' : ''}`,
       "font-src 'self' https: data:",
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
       'upgrade-insecure-requests'
-    ].join('; ');
+    ];
+    const csp = directives.join('; ');
 
     const m1 = document.createElement('meta');
     m1.httpEquiv = 'Content-Security-Policy';
@@ -52,14 +55,17 @@ function SecurityLayer() {
       a.setAttribute('rel', rel.join(' '));
     });
 
-    // Bloquear eval()
-    const previousEval = window.eval;
-    const blockEval = function () {
-      throw new Error('eval() bloqueado');
-    };
-    try {
-      window.eval = blockEval;
-    } catch {}
+    // Bloquear eval() (solo en producción para no interferir con el dev server)
+    let previousEval = undefined;
+    if (!isDev) {
+      previousEval = window.eval;
+      const blockEval = function () {
+        throw new Error('eval() bloqueado');
+      };
+      try {
+        window.eval = blockEval;
+      } catch {}
+    }
 
     return () => {
       [m1, m2, m3].forEach((meta) => {
@@ -75,9 +81,11 @@ function SecurityLayer() {
           a.removeAttribute('rel');
         }
       });
-      try {
-        window.eval = previousEval;
-      } catch {}
+      if (!isDev && typeof previousEval === 'function') {
+        try {
+          window.eval = previousEval;
+        } catch {}
+      }
     };
   }, []);
   return null;
