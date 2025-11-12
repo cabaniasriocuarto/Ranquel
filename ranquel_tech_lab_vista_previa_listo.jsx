@@ -78,8 +78,11 @@ function FuturisticStyle(){
       .glow{ box-shadow: 0 10px 30px rgba(0,0,0,.35), 0 0 32px rgba(34,204,255,.12) }
       .badge{ display:inline-block; border:1px solid var(--border); padding:.25rem .6rem; border-radius:999px; background:linear-gradient(90deg, rgba(34,204,255,.18), rgba(34,204,255,.05)); color:var(--text)}
       .grid{display:grid; gap:1rem}
-      @media(min-width:640px){ .grid-2{grid-template-columns:repeat(2,1fr)} }
-      @media(min-width:1024px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
+      @media(min-width:640px){
+        .grid-2{grid-template-columns:repeat(2,1fr)}
+        .grid-3{grid-template-columns:repeat(2, minmax(0,1fr))}
+      }
+      @media(min-width:900px){ .grid-3{grid-template-columns:repeat(3, minmax(0,1fr))} }
       header.backdrop{backdrop-filter:saturate(150%) blur(10px); background:rgba(15,18,22,.65)}
       a:focus, button:focus{outline:2px solid var(--accent); outline-offset:3px; border-radius:10px}
       /* Medios 16:9 */
@@ -87,6 +90,11 @@ function FuturisticStyle(){
               background:linear-gradient(135deg, rgba(34,204,255,.18), rgba(34,204,255,.06)); overflow:hidden; display:flex; align-items:center; justify-content:center }
       .thumb svg{ width:70%; height:70%; color:var(--text)}
       .thumb-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+      #hero{min-height:520px}
+      #hero .wrap{position:relative; z-index:1}
+      .hero-bg{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+      .hero-bg img{ width:100%; height:100%; object-fit:cover; filter:brightness(.45) saturate(1.2); transform:scale(1.05); }
+      .hero-bg::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,13,16,.65), rgba(11,13,16,.85)); }
       /* Método: card = media + contenido */
       .step-card{ display:grid; grid-template-rows:auto 1fr; gap:10px; height:100% }
       .step-media{ border-radius:12px; border:1px solid var(--border); overflow:hidden; aspect-ratio:16/9; background:linear-gradient(135deg, rgba(34,204,255,.12), rgba(34,204,255,.04)) }
@@ -149,8 +157,12 @@ function IcoOptions(){ return (<svg aria-hidden="true" width="18" height="18" vi
    ===================== */
 function Hero({ onOpenOpciones, onOpenChat }:{ onOpenOpciones: ()=>void, onOpenChat: ()=>void }){
   const wa = "#"; // TODO: reemplazar por https://wa.me/XXXXXXXXXXX
+  const heroGif = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGg2eG5tbHcxOXZkMzAxM3I3ODV3dHFhZDV0M3ozdWlkb2E0eWp5dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3ohzdIuqJoo8QdKlnW/giphy.gif";
   return (
     <section id="hero" style={{position:'relative', overflow:'hidden', borderBottom:'1px solid var(--border)'}}>
+      <div className="hero-bg" aria-hidden="true">
+        <img src={heroGif} alt="" />
+      </div>
       <div className="wrap" style={{paddingTop:112, paddingBottom:80}}>
         <span className="badge">En la cúspide de la tecnología</span>
         <h1 className="neon" style={{fontSize:'clamp(32px,6vw,56px)', fontWeight:800, letterSpacing:.2, marginTop:12}}>Creamos software inteligente que impulsa tu negocio.</h1>
@@ -178,7 +190,7 @@ function About({ onOpenOpciones }:{ onOpenOpciones: ()=>void }){
           <p style={{marginTop:10, color:'var(--text-muted)'}}>Porque todo se puede <strong>Codificar</strong>, podemos diseñar el software a medida que necesites. Nos comentás dónde está tu cuello de botella o tu necesidad de mejora, analizamos la situación y damos soluciones.</p>
           <div style={{marginTop:16}}><button onClick={onOpenOpciones} className="btn btn-accent glow">Conocé Opciones de Desarrollo</button></div>
         </div>
-        <div className="thumb"><img className="thumb-img" alt="Equipo de trabajo tecnológico" src="https://source.unsplash.com/800x500/?team,technology,meeting"/></div>
+        <div className="thumb"><img className="thumb-img" alt="Equipo colaborando frente a laptops" src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=1200&q=80"/></div>
       </div>
     </section>
   );
@@ -186,12 +198,12 @@ function About({ onOpenOpciones }:{ onOpenOpciones: ()=>void }){
 
 function Services(){
   const items = [
-    { title:"Desarrollo Web", desc:"SEO, performance, e‑commerce y landings rápidas.", img:"https://source.unsplash.com/800x500/?code,website" },
-    { title:"Dominios", desc:"Nos encargamos de tu hosting y del dominio que necesitás para tu web.", img:"https://source.unsplash.com/800x500/?server,datacenter" },
-    { title:"Apps Android", desc:"Java/Kotlin, publicación en Play Store.", img:"https://source.unsplash.com/800x500/?android,smartphone,app" },
-    { title:"Sistemas a medida", desc:"Java/Node.js, dashboards y microservicios.", img:"https://source.unsplash.com/800x500/?dashboard,software" },
-    { title:"SEO + Ads", desc:"Google/Meta con medición y experimentos.", img:"https://source.unsplash.com/800x500/?seo,marketing" },
-    { title:"Analítica", desc:"GA4, GTM, Search Console y Bing Webmaster.", img:"https://source.unsplash.com/800x500/?analytics,data" },
+    { title:"Desarrollo Web", desc:"SEO, performance, e‑commerce y landings rápidas.", img:"https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=1200&q=80" },
+    { title:"Dominios", desc:"Nos encargamos de tu hosting y del dominio que necesitás para tu web.", img:"https://images.unsplash.com/photo-1580894894518-ec8bd1c7b1e8?auto=format&fit=crop&w=1200&q=80" },
+    { title:"Apps Android", desc:"Java/Kotlin, publicación en Play Store.", img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80" },
+    { title:"Sistemas a medida", desc:"Java/Node.js, dashboards y microservicios.", img:"https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=1200&q=80" },
+    { title:"SEO + Ads", desc:"Google/Meta con medición y experimentos.", img:"https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1200&q=80" },
+    { title:"Analítica", desc:"GA4, GTM, Search Console y Bing Webmaster.", img:"https://images.unsplash.com/photo-1556157381-97ada4dc4e43?auto=format&fit=crop&w=1200&q=80" },
   ];
   return (
     <section id="services" className="wrap" style={{paddingTop:64, paddingBottom:64}}>
@@ -223,9 +235,9 @@ function IAaplicada({ onOpenOpciones }:{ onOpenOpciones: ()=>void }){
     { title: "Bots conversacionales", desc: "Web/WhatsApp/Instagram que atienden, reservan, cobran y escalan a un humano cuando corresponde. Entrenados con tu contenido, con analytics de conversaciones y mejoras continuas para elevar la experiencia del cliente.", Icon: SvgBots },
   ];
   const pics: Record<string,string> = {
-    "Asesoramiento": "https://source.unsplash.com/800x500/?consulting,team,data",
-    "GPTs a medida": "https://source.unsplash.com/800x500/?ai,assistant,chatbot,code",
-    "Bots conversacionales": "https://source.unsplash.com/800x500/?chat,bot,conversation"
+    "Asesoramiento": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
+    "GPTs a medida": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
+    "Bots conversacionales": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80"
   };
   return (
     <section id="ia" className="wrap" style={{paddingTop:64, paddingBottom:64}}>
@@ -250,17 +262,15 @@ function IAaplicada({ onOpenOpciones }:{ onOpenOpciones: ()=>void }){
 }
 
 function Marketing(){
-  // Reemplaza logos: quitamos 'Google' genérico y agregamos específicos
   const logos = [
-    { alt: 'Google Ads', src: 'https://logo.clearbit.com/ads.google.com' },
-    { alt: 'Bing Ads', src: 'https://logo.clearbit.com/ads.microsoft.com' },
-    { alt: 'Meta', src: 'https://logo.clearbit.com/meta.com' },
-    { alt: 'Instagram', src: 'https://logo.clearbit.com/instagram.com' },
-    { alt: 'Facebook', src: 'https://logo.clearbit.com/facebook.com' },
-    { alt: 'WhatsApp', src: 'https://logo.clearbit.com/whatsapp.com' },
-    { alt: 'Google Analytics', src: 'https://logo.clearbit.com/marketingplatform.google.com' },
-    { alt: 'Google Tag Manager', src: 'https://logo.clearbit.com/tagmanager.google.com' },
-    { alt: 'Google Search Console', src: 'https://logo.clearbit.com/search.google.com' }
+    { alt: 'Google Analytics', src: 'https://www.gstatic.com/analytics-suite/header/suite/v2/ic_analytics.svg' },
+    { alt: 'Bing Ads', src: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Microsoft_Advertising_logo.svg' },
+    { alt: 'Google Search Console', src: 'https://www.gstatic.com/webmasters/ui/logo-legacy.svg' },
+    { alt: 'Google Tag Manager', src: 'https://www.gstatic.com/tagmanager/images/home/tag-manager-icon.png' },
+    { alt: 'Meta', src: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Meta_Platforms_Inc._logo.svg' },
+    { alt: 'Instagram', src: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg' },
+    { alt: 'Facebook', src: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Facebook_icon.svg' },
+    { alt: 'WhatsApp', src: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' }
   ];
   return (
     <section id="marketing" className="wrap" style={{paddingTop:64, paddingBottom:64}}>
@@ -279,12 +289,12 @@ function Marketing(){
 
 function Metodo(){
   const pasos = [
-    { n:1, t:"1 Escuchamos las Necesidades del Cliente.", d:"Para poder arrancar con cualquier proyecto necesitamos saber cuales son las necesides de nuestro clientes y el modo operandi de su negocio, solicitamos toda la información que nos puedan brindar...y ahora es cuando estamos en condiciones de seguir al próximo paso.", img:"https://source.unsplash.com/800x500/?client,meeting" },
-    { n:2, t:"2- Analizamos la competencia.", d:"Comparamos los standares de la competencia para superarlos.", img:"https://source.unsplash.com/800x500/?analytics,competitor" },
-    { n:3, t:"3- Estudiamos el Proyecto", d:"Con la información recopilada, buscamos las mejores estrategias tecnológicas que se adecúen a las necesidades y objetivos de nuestro clientes.", img:"https://source.unsplash.com/800x500/?planning,technology" },
-    { n:4, t:"4- Materealizando Objetivos.", d:"Ponemos Marcha y hacemos maqueta previa según  todo la información obtenida y analizada. Se presenta una primera muestra de lo Trabajado y se abona un 50% del presupuesto.", img:"https://source.unsplash.com/800x500/?prototype,ui" },
-    { n:5, t:"5- Conexión con Buscadores y SEO", d:`Conectamos la web a :\nGoogle Ads (publicidad de Google)\nGoogle Tag Manager.\nGoogle Analitycs.\nGoogle Search Console.\nMeta = Facebook + Instagram + Whatsapp\nBing\nBing Adds (Publicidad de Bing)\nOptimización e Indexación de la Página para reconocimiento prioritario en buscadores.\nY más a medida que se vayan implementando nuevas tecnologías de Marketing.`, img:"https://source.unsplash.com/800x500/?seo,search" },
-    { n:6, t:"6- Entrega de la web, Puesta a punto y seguimiento mensual.", d:`Ultimamos detalles.\nSe Abona el 50% del presupuesto restante.\nHacemos entrega de la Página Web y hacemos un segumiento mensual para la implementación de nuevas tecnologías.`, img:"https://source.unsplash.com/800x500/?delivery,launch" },
+    { n:1, t:"1 Escuchamos las Necesidades del Cliente.", d:"Para poder arrancar con cualquier proyecto necesitamos saber cuales son las necesides de nuestro clientes y el modo operandi de su negocio, solicitamos toda la información que nos puedan brindar...y ahora es cuando estamos en condiciones de seguir al próximo paso.", img:"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80" },
+    { n:2, t:"2- Analizamos la competencia.", d:"Comparamos los standares de la competencia para superarlos.", img:"https://images.unsplash.com/photo-1454165205744-3b78555e5572?auto=format&fit=crop&w=1200&q=80" },
+    { n:3, t:"3- Estudiamos el Proyecto", d:"Con la información recopilada, buscamos las mejores estrategias tecnológicas que se adecúen a las necesidades y objetivos de nuestro clientes.", img:"https://images.unsplash.com/photo-1523475472560-d2df97ec485c?auto=format&fit=crop&w=1200&q=80" },
+    { n:4, t:"4- Materealizando Objetivos.", d:"Ponemos Marcha y hacemos maqueta previa según  todo la información obtenida y analizada. Se presenta una primera muestra de lo Trabajado y se abona un 50% del presupuesto.", img:"https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80" },
+    { n:5, t:"5- Conexión con Buscadores y SEO", d:`Conectamos la web a :\nGoogle Ads (publicidad de Google)\nGoogle Tag Manager.\nGoogle Analitycs.\nGoogle Search Console.\nMeta = Facebook + Instagram + Whatsapp\nBing\nBing Adds (Publicidad de Bing)\nOptimización e Indexación de la Página para reconocimiento prioritario en buscadores.\nY más a medida que se vayan implementando nuevas tecnologías de Marketing.`, img:"https://images.unsplash.com/photo-1526378722461-58fed0b9c1b0?auto=format&fit=crop&w=1200&q=80" },
+    { n:6, t:"6- Entrega de la web, Puesta a punto y seguimiento mensual.", d:`Ultimamos detalles.\nSe Abona el 50% del presupuesto restante.\nHacemos entrega de la Página Web y hacemos un segumiento mensual para la implementación de nuevas tecnologías.`, img:"https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80" },
   ];
   return (
     <section id="metodo" className="wrap" style={{paddingTop:64, paddingBottom:64}}>
