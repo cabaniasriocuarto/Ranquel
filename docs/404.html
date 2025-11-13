@@ -5,9 +5,402 @@
     <link rel="icon" type="image/svg+xml" href="/Ranquel/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ranquel Tech Lab</title>
-    <script type="module" crossorigin src="/Ranquel/assets/index-DWcOLmzG.js"></script>
+    <script type="module" crossorigin src="./assets/index-DWcOLmzG.js"></script>
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (() => {
+        const moduleScript = document.querySelector('script[type="module"][src]');
+        const baseURL = moduleScript ? new URL('..', moduleScript.src) : new URL('./', window.location.href);
+        const encodeRelative = (relativePath) =>
+          relativePath
+            .split('/')
+            .map((segment) => encodeURIComponent(segment))
+            .join('/');
+        const resolve = (relativePath) => {
+          try {
+            return new URL(encodeRelative(relativePath), baseURL).toString();
+          } catch {
+            return relativePath;
+          }
+        };
+
+        const ensureStyle = () => {
+          if (document.getElementById('rtl-overrides')) return;
+          const style = document.createElement('style');
+          style.id = 'rtl-overrides';
+          style.textContent = `
+            :root{
+              --bg:#172739;
+              --bg-2:#1f344a;
+              --surface:rgba(20,32,46,0.78);
+              --border:rgba(255,255,255,0.18);
+              --text:#f7fbff;
+              --text-muted:#d1deea;
+              --accent:#5ae0ff;
+              --accent-600:#3fcdf1;
+              --accent-700:#20b4da;
+            }
+            body{
+              background:
+                radial-gradient(1200px 720px at 20% -140px, rgba(90,224,255,0.45), transparent),
+                radial-gradient(960px 580px at 82% -160px, rgba(90,224,255,0.36), transparent),
+                linear-gradient(185deg, rgba(28,45,63,0.88), rgba(18,30,44,0.82));
+              color:var(--text);
+            }
+            .panel{
+              background:rgba(18,30,44,0.76) !important;
+              border-color:rgba(255,255,255,0.14) !important;
+              box-shadow:0 24px 54px rgba(10,18,30,0.38) !important;
+            }
+            #hero .panel{
+              background:rgba(18,30,44,0.72) !important;
+            }
+            #marketing .panel{
+              background:rgba(21,33,48,0.86) !important;
+            }
+            #marketing .panel img{
+              filter:drop-shadow(0 4px 12px rgba(0,0,0,0.45));
+            }
+            .hero-overlay{
+              background:linear-gradient(118deg, rgba(18,28,40,0.68) 0%, rgba(18,28,40,0.48) 46%, rgba(18,28,40,0.18) 100%) !important;
+            }
+            .hero-bg{
+              opacity:.55 !important;
+              filter:saturate(1.15) brightness(1.35) !important;
+            }
+            .badge{
+              background:linear-gradient(90deg, rgba(90,224,255,0.36), rgba(90,224,255,0.16)) !important;
+            }
+            .rtl-btn-icon{
+              width:22px;
+              height:22px;
+              object-fit:contain;
+            }
+            .btn .rtl-btn-icon + span,
+            .btn .rtl-chat-icon + span{
+              margin-left:8px;
+            }
+            #hero .btn .rtl-chat-icon{
+              width:22px;
+              height:22px;
+              margin-right:0;
+            }
+            .rtl-sr-only{
+              position:absolute;
+              width:1px;
+              height:1px;
+              padding:0;
+              margin:-1px;
+              overflow:hidden;
+              clip:rect(0,0,0,0);
+              white-space:nowrap;
+              border:0;
+            }
+            #chat{
+              filter:drop-shadow(0 18px 36px rgba(6,16,26,0.45));
+            }
+            #chat > button{
+              width:68px;
+              height:68px;
+              border-radius:9999px !important;
+              padding:0 !important;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              background:linear-gradient(135deg, rgba(72,212,255,0.95), rgba(35,148,255,0.95)) !important;
+              border:1px solid rgba(255,255,255,0.18) !important;
+              box-shadow:0 22px 44px rgba(4,12,22,0.5), 0 0 24px rgba(72,212,255,0.45) !important;
+              transition:transform .25s ease, box-shadow .25s ease;
+            }
+            #chat > button:hover{
+              transform:translateY(-4px);
+              box-shadow:0 28px 52px rgba(4,12,22,0.5),0 0 30px rgba(72,212,255,0.55) !important;
+            }
+            #chat > button:active{
+              transform:translateY(-1px);
+            }
+            #chat > button svg{
+              width:30px;
+              height:30px;
+            }
+            .rtl-reveal{
+              opacity:0;
+              transform:translateY(70px);
+              transition:opacity .9s ease, transform .9s cubic-bezier(.25,.1,.25,1);
+            }
+            .rtl-reveal.is-visible{
+              opacity:1;
+              transform:none;
+            }
+          `;
+          document.head.appendChild(style);
+        };
+
+        const directSelectors = new Map([
+          ['img.hero-bg', 'images/Portada.jpg']
+        ]);
+
+        const altMap = new Map([
+          ['Equipo de trabajo tecnológico', 'images/logo.png'],
+          ['Desarrollo Web', 'images/ChatGPT Image 13 nov 2025, 01_45_44 a.m..png'],
+          ['Dominios', 'images/Dominios.webp'],
+          ['Apps Android', 'images/Apps Android.jpg'],
+          ['Sistemas a medida', 'images/Sistemas a Medida.jpg'],
+          ['SEO + Ads', 'images/SEO + Ads.jpg'],
+          ['Analítica', 'images/Analitica.jpg'],
+          ['Asesoramiento', 'images/Asesoramiento.jpg'],
+          ['GPTs a medida', 'images/GPTs A medida.jpg'],
+          ['Bots conversacionales', 'images/Bots Conversacionales.jpg'],
+          ['1. Preparamos la información', 'images/Preparamos la Información.png'],
+          ['2. Diseñamos el flujo y conectamos canales', 'images/Diseñamos Flujo Conectamos Canales.png'],
+          ['3. Entrenamos, probamos y lanzamos', 'images/Entrenamos Probamos y Lanzamos.png'],
+          ['1 Escuchamos las Necesidades del Cliente.', 'images/Escuchamos las necesidades del cliente.png'],
+          ['2- Analizamos la competencia.', 'images/Analizamos la competencia.png'],
+          ['3- Estudiamos el Proyecto', 'images/Estudiamos el Proyecto.png'],
+          ['4- Materealizando Objetivos.', 'images/Materealizando Objetivos.png'],
+          ['5- Conexión con Buscadores y SEO', 'images/Conexion buscadores seo.png'],
+          ['6- Entrega de la web, Puesta a punto y seguimiento mensual.', 'images/Entrega de la web, Puesta a punto y seguimiento mensual..png'],
+          ['Google Ads', 'logos/google-ads.svg'],
+          ['Microsoft Advertising', 'logos/microsoft-advertising.svg'],
+          ['Meta', 'logos/meta.svg'],
+          ['Instagram', 'logos/instagram.svg'],
+          ['Facebook', 'logos/facebook.svg'],
+          ['WhatsApp', 'logos/whatsapp.svg'],
+          ['Google Analytics', 'logos/google-analytics.svg'],
+          ['Google Tag Manager', 'logos/google-tag-manager.svg'],
+          ['Google Search Console', 'logos/google-search-console.svg']
+        ]);
+
+        const assignSrc = (img, relativePath) => {
+          if (!img || !relativePath) return;
+          const target = resolve(relativePath);
+          if (img.getAttribute('data-local-img') === target) return;
+          img.src = target;
+          img.setAttribute('data-local-img', target);
+          if (!img.hasAttribute('loading')) {
+            img.setAttribute('loading', 'lazy');
+          }
+          if (!img.hasAttribute('decoding')) {
+            img.setAttribute('decoding', 'async');
+          }
+        };
+
+        const NS = 'http://www.w3.org/2000/svg';
+
+        const brandButtonMap = [
+          { match: (text) => text === 'whatsapp', type: 'img', asset: 'logos/whatsapp.svg' },
+          { match: (text) => text === 'facebook', type: 'img', asset: 'logos/facebook.svg' },
+          { match: (text) => text === 'instagram', type: 'img', asset: 'logos/instagram.svg' },
+          { match: (text) => text === 'linkedin', type: 'svg', factory: () => {
+              const svg = document.createElementNS(NS, 'svg');
+              svg.setAttribute('viewBox', '0 0 24 24');
+              svg.setAttribute('aria-hidden', 'true');
+              svg.classList.add('rtl-btn-icon');
+              const bg = document.createElementNS(NS, 'rect');
+              bg.setAttribute('width', '24');
+              bg.setAttribute('height', '24');
+              bg.setAttribute('rx', '4');
+              bg.setAttribute('fill', '#0A66C2');
+              const glyph = document.createElementNS(NS, 'path');
+              glyph.setAttribute('fill', '#ffffff');
+              glyph.setAttribute(
+                'd',
+                'M6.6 18.4h2.7V9.8H6.6v8.6Zm1.35-9.8a1.56 1.56 0 1 0 0-3.12 1.56 1.56 0 0 0 0 3.12ZM18.7 18.4h-2.7v-4.38c0-1.1-.39-1.83-1.34-1.83-.73 0-1.16.49-1.36.96-.07.17-.09.4-.09.64v4.61H10.5c.04-7.48 0-8.26 0-8.26h2.7v1.32c.36-.55 1.03-1.33 2.51-1.33 1.83 0 3.49 1.2 3.49 3.76v4.51Z'
+              );
+              svg.append(bg, glyph);
+              return svg;
+            }
+          }
+        ];
+
+        const createBubbleIcon = () => {
+          const svg = document.createElementNS(NS, 'svg');
+          svg.setAttribute('viewBox', '0 0 24 24');
+          svg.setAttribute('aria-hidden', 'true');
+          svg.classList.add('rtl-chat-icon');
+          const body = document.createElementNS(NS, 'path');
+          body.setAttribute('fill', 'currentColor');
+          body.setAttribute(
+            'd',
+            'M4.25 3.5h15.5A2.25 2.25 0 0 1 22 5.75v7.75a2.25 2.25 0 0 1-2.25 2.25h-6.15l-4.72 3.75a.9.9 0 0 1-1.47-.7v-3.05H4.25A2.25 2.25 0 0 1 2 13.5V5.75A2.25 2.25 0 0 1 4.25 3.5Z'
+          );
+          svg.appendChild(body);
+          [7, 12, 17].forEach((cx) => {
+            const dot = document.createElementNS(NS, 'circle');
+            dot.setAttribute('cx', cx.toString());
+            dot.setAttribute('cy', '10.5');
+            dot.setAttribute('r', '1.15');
+            dot.setAttribute('fill', 'rgba(255,255,255,0.6)');
+            svg.appendChild(dot);
+          });
+          return svg;
+        };
+
+        const ensureBrandButtons = () => {
+          document.querySelectorAll('.btn').forEach((btn) => {
+            if (!btn || btn.closest('#chat')) return;
+            const text = (btn.textContent || '').trim();
+            if (!text) return;
+            const lower = text.toLowerCase();
+            if (lower === 'chat bot' || lower === 'chat') {
+              const existing = btn.querySelector('.rtl-chat-icon');
+              if (!existing) {
+                const label = document.createElement('span');
+                label.textContent = text;
+                btn.textContent = '';
+                btn.append(createBubbleIcon(), label);
+              }
+              return;
+            }
+            const match = brandButtonMap.find((item) => {
+              try {
+                return item.match(lower);
+              } catch {
+                return false;
+              }
+            });
+            if (!match) return;
+            let icon = btn.querySelector('.rtl-btn-icon');
+            if (!icon) {
+              if (match.type === 'img') {
+                icon = document.createElement('img');
+                icon.className = 'rtl-btn-icon';
+                icon.alt = '';
+                icon.setAttribute('aria-hidden', 'true');
+              } else if (match.type === 'svg' && typeof match.factory === 'function') {
+                icon = match.factory();
+              }
+              if (icon) {
+                const label = document.createElement('span');
+                label.textContent = text;
+                btn.textContent = '';
+                btn.append(icon, label);
+              }
+            }
+            if (icon && match.type === 'img' && match.asset) {
+              icon.src = resolve(match.asset);
+            }
+          });
+        };
+
+        const removeBotCta = () => {
+          const hero = document.getElementById('hero');
+          if (!hero) return;
+          const target = Array.from(hero.querySelectorAll('button')).find(
+            (btn) => (btn.textContent || '').trim().toLowerCase() === 'configurar mi bot'
+          );
+          if (target) {
+            target.remove();
+          }
+        };
+
+        const ensureChatBubble = () => {
+          const wrapper = document.getElementById('chat');
+          if (!wrapper) return;
+          const btn = wrapper.querySelector('button');
+          if (!btn) return;
+          if (!btn.querySelector('.rtl-chat-icon')) {
+            btn.textContent = '';
+            btn.append(createBubbleIcon());
+            const sr = document.createElement('span');
+            sr.className = 'rtl-sr-only';
+            sr.textContent = 'Abrir chat';
+            btn.append(sr);
+          }
+          const srOnly = btn.querySelector('.rtl-sr-only');
+          const panelOpen = wrapper.querySelector('.panel') !== null;
+          btn.setAttribute('aria-label', panelOpen ? 'Cerrar chat' : 'Abrir chat');
+          if (srOnly) {
+            srOnly.textContent = panelOpen ? 'Cerrar chat' : 'Abrir chat';
+          }
+        };
+
+        const revealObserver =
+          'IntersectionObserver' in window
+            ? new IntersectionObserver(
+                (entries) => {
+                  entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                      entry.target.classList.add('is-visible');
+                      revealObserver.unobserve(entry.target);
+                    }
+                  });
+                },
+                { threshold: 0.2, rootMargin: '0px 0px -10%' }
+              )
+            : null;
+
+        const markReveal = (el, delay = 0) => {
+          if (!el) return;
+          if (!el.classList.contains('rtl-reveal')) {
+            el.classList.add('rtl-reveal');
+          }
+          el.style.setProperty('--rtl-delay', `${delay}s`);
+          if (revealObserver && !el.dataset.rtlReveal) {
+            el.dataset.rtlReveal = 'true';
+            revealObserver.observe(el);
+          } else if (!revealObserver) {
+            el.classList.add('is-visible');
+          }
+        };
+
+        const ensureReveals = () => {
+          const sections = Array.from(document.querySelectorAll('#root section')).filter(
+            (section) => section.id && section.id !== 'hero'
+          );
+          sections.forEach((section, idx) => markReveal(section, Math.min(idx * 0.1, 0.4)));
+
+          const map = [
+            ['#about .about-grid > *', 0.05],
+            ['#services article', 0.06],
+            ['#ia article', 0.06],
+            ['#bot-guide article', 0.06],
+            ['#marketing .panel', 0.05],
+            ['#metodo article', 0.05],
+            ['#opciones article', 0.05],
+            ['footer .panel, footer .cta-rail', 0.05]
+          ];
+
+          map.forEach(([selector, step]) => {
+            Array.from(document.querySelectorAll(selector)).forEach((node, idx) => {
+              markReveal(node, 0.1 + idx * step);
+            });
+          });
+        };
+
+        const apply = () => {
+          ensureStyle();
+          directSelectors.forEach((relativePath, selector) => {
+            document.querySelectorAll(selector).forEach((img) => assignSrc(img, relativePath));
+          });
+          document.querySelectorAll('img[alt]').forEach((img) => {
+            const alt = (img.getAttribute('alt') || '').trim();
+            if (!alt) return;
+            const relativePath = altMap.get(alt);
+            if (relativePath) {
+              assignSrc(img, relativePath);
+            }
+          });
+          removeBotCta();
+          ensureBrandButtons();
+          ensureChatBubble();
+          ensureReveals();
+        };
+
+        const root = document.getElementById('root');
+        if (root) {
+          const observer = new MutationObserver(() => apply());
+          observer.observe(root, { childList: true, subtree: true });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', () => apply(), { once: true });
+        } else {
+          apply();
+        }
+      })();
+    </script>
   </body>
 </html>
