@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/Ranquel/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ranquel Tech Lab</title>
-    <script type="module" crossorigin src="/Ranquel/assets/index-B3JEdxM_.js"></script>
+    <script type="module" crossorigin src="./assets/index-B3JEdxM_.js"></script>
   </head>
   <body>
     <div id="root"></div>
@@ -32,46 +32,46 @@
           style.id = 'rtl-overrides';
           style.textContent = `
             :root{
-              --bg:#131d27;
-              --bg-2:#16232f;
-              --surface:rgba(17,27,38,0.82);
-              --border:rgba(255,255,255,0.16);
-              --text:#f5fbff;
-              --text-muted:#c7d8e4;
-              --accent:#48d4ff;
-              --accent-600:#2cc1f0;
-              --accent-700:#16a8d8;
+              --bg:#172739;
+              --bg-2:#1f344a;
+              --surface:rgba(20,32,46,0.78);
+              --border:rgba(255,255,255,0.18);
+              --text:#f7fbff;
+              --text-muted:#d1deea;
+              --accent:#5ae0ff;
+              --accent-600:#3fcdf1;
+              --accent-700:#20b4da;
             }
             body{
               background:
-                radial-gradient(1200px 720px at 18% -140px, rgba(72,212,255,0.35), transparent),
-                radial-gradient(960px 580px at 86% -160px, rgba(72,212,255,0.28), transparent),
-                linear-gradient(185deg, rgba(19,29,39,0.95), rgba(9,16,24,0.92));
+                radial-gradient(1200px 720px at 20% -140px, rgba(90,224,255,0.45), transparent),
+                radial-gradient(960px 580px at 82% -160px, rgba(90,224,255,0.36), transparent),
+                linear-gradient(185deg, rgba(28,45,63,0.88), rgba(18,30,44,0.82));
               color:var(--text);
             }
             .panel{
-              background:rgba(12,20,30,0.8) !important;
-              border-color:rgba(255,255,255,0.12) !important;
-              box-shadow:0 20px 44px rgba(6,12,20,0.48) !important;
+              background:rgba(18,30,44,0.76) !important;
+              border-color:rgba(255,255,255,0.14) !important;
+              box-shadow:0 24px 54px rgba(10,18,30,0.38) !important;
             }
             #hero .panel{
-              background:rgba(10,18,28,0.78) !important;
+              background:rgba(18,30,44,0.72) !important;
             }
             #marketing .panel{
-              background:rgba(14,24,35,0.88) !important;
+              background:rgba(21,33,48,0.86) !important;
             }
             #marketing .panel img{
               filter:drop-shadow(0 4px 12px rgba(0,0,0,0.45));
             }
             .hero-overlay{
-              background:linear-gradient(118deg, rgba(11,17,26,0.84) 0%, rgba(11,17,26,0.6) 46%, rgba(11,17,26,0.22) 100%) !important;
+              background:linear-gradient(118deg, rgba(18,28,40,0.68) 0%, rgba(18,28,40,0.48) 46%, rgba(18,28,40,0.18) 100%) !important;
             }
             .hero-bg{
-              opacity:.4 !important;
-              filter:saturate(1.08) brightness(1.12) !important;
+              opacity:.55 !important;
+              filter:saturate(1.15) brightness(1.35) !important;
             }
             .badge{
-              background:linear-gradient(90deg, rgba(72,212,255,0.32), rgba(72,212,255,0.12)) !important;
+              background:linear-gradient(90deg, rgba(90,224,255,0.36), rgba(90,224,255,0.16)) !important;
             }
             .rtl-btn-icon{
               width:22px;
@@ -156,12 +156,12 @@
           ['1. Preparamos la información', 'images/Preparamos la Información.png'],
           ['2. Diseñamos el flujo y conectamos canales', 'images/Diseñamos Flujo Conectamos Canales.png'],
           ['3. Entrenamos, probamos y lanzamos', 'images/Entrenamos Probamos y Lanzamos.png'],
-          ['Paso 1', 'images/Escuchamos las necesidades del cliente.png'],
-          ['Paso 2', 'images/Analizamos la competencia.png'],
-          ['Paso 3', 'images/Estudiamos el Proyecto.png'],
-          ['Paso 4', 'images/Materealizando Objetivos.png'],
-          ['Paso 5', 'images/Conexion buscadores seo.png'],
-          ['Paso 6', 'images/Entrega de la web, Puesta a punto y seguimiento mensual..png'],
+          ['1 Escuchamos las Necesidades del Cliente.', 'images/Escuchamos las necesidades del cliente.png'],
+          ['2- Analizamos la competencia.', 'images/Analizamos la competencia.png'],
+          ['3- Estudiamos el Proyecto', 'images/Estudiamos el Proyecto.png'],
+          ['4- Materealizando Objetivos.', 'images/Materealizando Objetivos.png'],
+          ['5- Conexión con Buscadores y SEO', 'images/Conexion buscadores seo.png'],
+          ['6- Entrega de la web, Puesta a punto y seguimiento mensual.', 'images/Entrega de la web, Puesta a punto y seguimiento mensual..png'],
           ['Google Ads', 'logos/google-ads.svg'],
           ['Microsoft Advertising', 'logos/microsoft-advertising.svg'],
           ['Meta', 'logos/meta.svg'],
@@ -187,11 +187,33 @@
           }
         };
 
-        const brandButtonMap = [
-          { match: 'whatsapp', asset: 'logos/whatsapp.svg' }
-        ];
-
         const NS = 'http://www.w3.org/2000/svg';
+
+        const brandButtonMap = [
+          { match: (text) => text === 'whatsapp', type: 'img', asset: 'logos/whatsapp.svg' },
+          { match: (text) => text === 'facebook', type: 'img', asset: 'logos/facebook.svg' },
+          { match: (text) => text === 'instagram', type: 'img', asset: 'logos/instagram.svg' },
+          { match: (text) => text === 'linkedin', type: 'svg', factory: () => {
+              const svg = document.createElementNS(NS, 'svg');
+              svg.setAttribute('viewBox', '0 0 24 24');
+              svg.setAttribute('aria-hidden', 'true');
+              svg.classList.add('rtl-btn-icon');
+              const bg = document.createElementNS(NS, 'rect');
+              bg.setAttribute('width', '24');
+              bg.setAttribute('height', '24');
+              bg.setAttribute('rx', '4');
+              bg.setAttribute('fill', '#0A66C2');
+              const glyph = document.createElementNS(NS, 'path');
+              glyph.setAttribute('fill', '#ffffff');
+              glyph.setAttribute(
+                'd',
+                'M6.6 18.4h2.7V9.8H6.6v8.6Zm1.35-9.8a1.56 1.56 0 1 0 0-3.12 1.56 1.56 0 0 0 0 3.12ZM18.7 18.4h-2.7v-4.38c0-1.1-.39-1.83-1.34-1.83-.73 0-1.16.49-1.36.96-.07.17-.09.4-.09.64v4.61H10.5c.04-7.48 0-8.26 0-8.26h2.7v1.32c.36-.55 1.03-1.33 2.51-1.33 1.83 0 3.49 1.2 3.49 3.76v4.51Z'
+              );
+              svg.append(bg, glyph);
+              return svg;
+            }
+          }
+        ];
 
         const createBubbleIcon = () => {
           const svg = document.createElementNS(NS, 'svg');
@@ -216,30 +238,13 @@
           return svg;
         };
 
-        const ensureHeroButtons = () => {
-          const hero = document.getElementById('hero');
-          if (!hero) return;
-          const buttons = hero.querySelectorAll('.btn');
-          buttons.forEach((btn) => {
+        const ensureBrandButtons = () => {
+          document.querySelectorAll('.btn').forEach((btn) => {
+            if (!btn || btn.closest('#chat')) return;
             const text = (btn.textContent || '').trim();
+            if (!text) return;
             const lower = text.toLowerCase();
-            const match = brandButtonMap.find((item) => lower.includes(item.match));
-            if (match) {
-              if (!btn.querySelector('.rtl-btn-icon')) {
-                const icon = document.createElement('img');
-                icon.className = 'rtl-btn-icon';
-                icon.alt = '';
-                icon.setAttribute('aria-hidden', 'true');
-                icon.src = resolve(match.asset);
-                const label = document.createElement('span');
-                label.textContent = text;
-                btn.textContent = '';
-                btn.append(icon, label);
-              } else {
-                const icon = btn.querySelector('.rtl-btn-icon');
-                icon.src = resolve(match.asset);
-              }
-            } else if (lower.includes('chat bot')) {
+            if (lower === 'chat bot' || lower === 'chat') {
               const existing = btn.querySelector('.rtl-chat-icon');
               if (!existing) {
                 const label = document.createElement('span');
@@ -247,6 +252,35 @@
                 btn.textContent = '';
                 btn.append(createBubbleIcon(), label);
               }
+              return;
+            }
+            const match = brandButtonMap.find((item) => {
+              try {
+                return item.match(lower);
+              } catch {
+                return false;
+              }
+            });
+            if (!match) return;
+            let icon = btn.querySelector('.rtl-btn-icon');
+            if (!icon) {
+              if (match.type === 'img') {
+                icon = document.createElement('img');
+                icon.className = 'rtl-btn-icon';
+                icon.alt = '';
+                icon.setAttribute('aria-hidden', 'true');
+              } else if (match.type === 'svg' && typeof match.factory === 'function') {
+                icon = match.factory();
+              }
+              if (icon) {
+                const label = document.createElement('span');
+                label.textContent = text;
+                btn.textContent = '';
+                btn.append(icon, label);
+              }
+            }
+            if (icon && match.type === 'img' && match.asset) {
+              icon.src = resolve(match.asset);
             }
           });
         };
@@ -350,7 +384,7 @@
             }
           });
           removeBotCta();
-          ensureHeroButtons();
+          ensureBrandButtons();
           ensureChatBubble();
           ensureReveals();
         };
