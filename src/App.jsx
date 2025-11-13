@@ -11,6 +11,67 @@ import React, { useState, useEffect } from 'react';
    ===================== */
 const isDev = typeof import.meta !== 'undefined' && import.meta?.env?.DEV;
 
+function encodeSvg(svg) {
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function splitLines(label, max = 18) {
+  const words = label.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = '';
+  words.forEach((word) => {
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length > max && current) {
+      lines.push(current);
+      current = word;
+    } else if (candidate.length > max) {
+      lines.push(candidate);
+      current = '';
+    } else {
+      current = candidate;
+    }
+  });
+  if (current) lines.push(current);
+  return lines.length ? lines : [label];
+}
+
+function makeIllustration(label, { variant = 'landscape' } = {}) {
+  const base = label.replace(/[^\w\d]+/g, '').toUpperCase();
+  const seed = base.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0) || 180;
+  const hue = seed % 360;
+  const hue2 = (hue + 45) % 360;
+  const dims = variant === 'square'
+    ? { width: 420, height: 420, rx: 48, stroke: 32 }
+    : { width: 800, height: 500, rx: 38, stroke: 40 };
+  const lines = splitLines(label.toUpperCase(), variant === 'square' ? 12 : 18).slice(0, 3);
+  const lineHeight = variant === 'square' ? 40 : 48;
+  const total = (lines.length - 1) * lineHeight;
+  const yStart = dims.height / 2 - total / 2;
+  const body = `
+    <svg xmlns='http://www.w3.org/2000/svg' width='${dims.width}' height='${dims.height}' viewBox='0 0 ${dims.width} ${dims.height}'>
+      <defs>
+        <linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'>
+          <stop offset='0%' stop-color='hsl(${hue},72%,55%)'/>
+          <stop offset='100%' stop-color='hsl(${hue2},78%,42%)'/>
+        </linearGradient>
+        <linearGradient id='glow' x1='0%' y1='0%' x2='100%' y2='0%'>
+          <stop offset='0%' stop-color='rgba(255,255,255,0.18)'/>
+          <stop offset='50%' stop-color='rgba(255,255,255,0.05)'/>
+          <stop offset='100%' stop-color='rgba(255,255,255,0.18)'/>
+        </linearGradient>
+      </defs>
+      <rect x='0' y='0' width='${dims.width}' height='${dims.height}' rx='${dims.rx}' fill='url(#g)'/>
+      <rect x='${dims.stroke / 2}' y='${dims.stroke / 2}' width='${dims.width - dims.stroke}' height='${dims.height - dims.stroke}' rx='${Math.max(dims.rx - 16, 16)}' fill='none' stroke='rgba(255,255,255,0.16)' stroke-width='${Math.max(6, dims.stroke / 5)}'/>
+      <rect x='${dims.stroke}' y='${dims.stroke}' width='${dims.width - dims.stroke * 2}' height='${dims.height - dims.stroke * 2}' rx='${Math.max(dims.rx - 24, 12)}' fill='url(#glow)' opacity='0.6'/>
+      ${variant === 'square'
+        ? `<circle cx='${dims.width / 2}' cy='${dims.height / 2 - 70}' r='90' fill='rgba(255,255,255,0.08)'/>`
+        : `<circle cx='${dims.width / 2 + 120}' cy='${dims.height / 2 - 120}' r='130' fill='rgba(255,255,255,0.08)'/>`}
+      ${lines.map((line, idx) => `<text x='50%' y='${yStart + idx * lineHeight}' text-anchor='middle' font-family="'Poppins', 'Segoe UI', sans-serif" font-weight='700' font-size='${variant === 'square' ? 34 : 42}' letter-spacing='1.2' fill='rgba(255,255,255,0.95)'>${line}</text>`).join('')}
+    </svg>
+  `;
+  return encodeSvg(body);
+}
+
 function SecurityLayer() {
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
@@ -196,7 +257,9 @@ function IcoOptions() {
 /* =====================
    4) Hero con 3 botones
    ===================== */
-function Hero({ onOpenOpciones, onOpenChat }) {
+const heroImage = makeIllustration('Equipo Ranquel');
+
+function Hero({ onOpenOpciones, onOpenChat, onOpenBotGuide }) {
   const wa = '#'; // TODO: reemplazar por https://wa.me/XXXXXXXXXXX
   return (
     <section id="hero" style={{ position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--border)' }}>
@@ -208,6 +271,7 @@ function Hero({ onOpenOpciones, onOpenChat }) {
           <a href={wa} className="btn btn-accent glow"><IcoWhatsApp /> WhatsApp</a>
           <button onClick={onOpenOpciones} className="btn btn-ghost"><IcoOptions /> Opciones de Desarrollo</button>
           <button onClick={onOpenChat} className="btn btn-ghost"><IcoChat /> Chat bot</button>
+          <button onClick={onOpenBotGuide} className="btn btn-ghost">Configurar mi bot</button>
         </div>
       </div>
     </section>
@@ -227,7 +291,7 @@ function About({ onOpenOpciones }) {
           <p style={{ marginTop: 10, color: 'var(--text-muted)' }}>Porque todo se puede <strong>Codificar</strong>, podemos diseñar el software a medida que necesites. Nos comentás dónde está tu cuello de botella o tu necesidad de mejora, analizamos la situación y damos soluciones.</p>
           <div style={{ marginTop: 16 }}><button onClick={onOpenOpciones} className="btn btn-accent glow">Conocé Opciones de Desarrollo</button></div>
         </div>
-        <div className="thumb"><img className="thumb-img" alt="Equipo de trabajo tecnológico" src="https://source.unsplash.com/800x500/?team,technology,meeting" /></div>
+        <div className="thumb"><img className="thumb-img" alt="Equipo de trabajo tecnológico" src={heroImage} /></div>
       </div>
     </section>
   );
@@ -235,12 +299,12 @@ function About({ onOpenOpciones }) {
 
 function Services() {
   const items = [
-    { title: 'Desarrollo Web', desc: 'SEO, performance, e‑commerce y landings rápidas.', img: 'https://source.unsplash.com/800x500/?code,website' },
-    { title: 'Dominios', desc: 'Nos encargamos de tu hosting y del dominio que necesitás para tu web.', img: 'https://source.unsplash.com/800x500/?server,datacenter' },
-    { title: 'Apps Android', desc: 'Java/Kotlin, publicación en Play Store.', img: 'https://source.unsplash.com/800x500/?android,smartphone,app' },
-    { title: 'Sistemas a medida', desc: 'Java/Node.js, dashboards y microservicios.', img: 'https://source.unsplash.com/800x500/?dashboard,software' },
-    { title: 'SEO + Ads', desc: 'Google/Meta con medición y experimentos.', img: 'https://source.unsplash.com/800x500/?seo,marketing' },
-    { title: 'Analítica', desc: 'GA4, GTM, Search Console y Bing Webmaster.', img: 'https://source.unsplash.com/800x500/?analytics,data' }
+    { title: 'Desarrollo Web', desc: 'SEO, performance, e‑commerce y landings rápidas.', img: makeIllustration('Desarrollo Web') },
+    { title: 'Dominios', desc: 'Nos encargamos de tu hosting y del dominio que necesitás para tu web.', img: makeIllustration('Dominios y Hosting') },
+    { title: 'Apps Android', desc: 'Java/Kotlin, publicación en Play Store.', img: makeIllustration('Apps Android') },
+    { title: 'Sistemas a medida', desc: 'Java/Node.js, dashboards y microservicios.', img: makeIllustration('Sistemas a Medida') },
+    { title: 'SEO + Ads', desc: 'Google/Meta con medición y experimentos.', img: makeIllustration('SEO + ADS') },
+    { title: 'Analítica', desc: 'GA4, GTM, Search Console y Bing Webmaster.', img: makeIllustration('Analítica Digital') }
   ];
   return (
     <section id="services" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
@@ -278,9 +342,9 @@ function IAaplicada({ onOpenOpciones }) {
     { title: 'Bots conversacionales', desc: 'Web/WhatsApp/Instagram que atienden, reservan, cobran y escalan a un humano cuando corresponde. Entrenados con tu contenido, con analytics de conversaciones y mejoras continuas para elevar la experiencia del cliente.' }
   ];
   const pics = {
-    Asesoramiento: 'https://source.unsplash.com/800x500/?consulting,team,data',
-    'GPTs a medida': 'https://source.unsplash.com/800x500/?ai,assistant,chatbot,code',
-    'Bots conversacionales': 'https://source.unsplash.com/800x500/?chat,bot,conversation'
+    Asesoramiento: makeIllustration('Asesoramiento IA'),
+    'GPTs a medida': makeIllustration('GPTs a Medida'),
+    'Bots conversacionales': makeIllustration('Bots Conversacionales')
   };
   return (
     <section id="ia" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
@@ -304,18 +368,65 @@ function IAaplicada({ onOpenOpciones }) {
   );
 }
 
+function BotSetupGuide() {
+  const steps = [
+    {
+      title: '1. Preparamos la información',
+      detail: 'Definimos objetivo del bot, tono de voz y recopilamos preguntas frecuentes, precios, horarios, catálogos y respuestas aprobadas.'
+    },
+    {
+      title: '2. Diseñamos el flujo y conectamos canales',
+      detail: 'Elegimos el canal (WhatsApp, Web, Instagram) y armamos el diagrama: captación, cualificación, derivaciones y entregables automáticos.'
+    },
+    {
+      title: '3. Entrenamos, probamos y lanzamos',
+      detail: 'Configuramos la plataforma (GPT/Dialogflow/Botpress), integramos con tu CRM o Sheets, probamos con tu equipo y dejamos tableros de métricas listos.'
+    }
+  ];
+  const extras = [
+    'Checklist editable para que cargues textos y FAQs.',
+    'Plantilla de guion de conversación (Google Docs).',
+    'Tablero inicial en Sheets para medir leads y derivaciones.'
+  ];
+  return (
+    <section id="bot-guide" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
+      <div style={{ textAlign: 'center' }}>
+        <h2 className="neon" style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800 }}>Configurá tu bot en 3 pasos</h2>
+        <p style={{ marginTop: 12, color: 'var(--text-muted)' }}>Nunca configuraste un bot? Te acompañamos con materiales listos para que avances sin trabas. Seguimos juntos cada paso hasta que esté atendiendo clientes reales.</p>
+      </div>
+      <div className="grid grid-3" style={{ marginTop: 24 }}>
+        {steps.map(({ title, detail }) => (
+          <article key={title} className="panel glow step-card" style={{ padding: 18 }}>
+            <div className="step-media"><img className="thumb-img" alt={title} src={makeIllustration(title)} /></div>
+            <div>
+              <h3 style={{ fontSize: 18, fontWeight: 700 }}>{title}</h3>
+              <p style={{ marginTop: 8, color: 'var(--text-muted)' }}>{detail}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="panel glow" style={{ marginTop: 24, padding: 20 }}>
+        <h3 style={{ fontWeight: 700 }}>¿Qué te damos para empezar hoy?</h3>
+        <ul style={{ marginTop: 12, display: 'grid', gap: 8 }}>
+          {extras.map((item, idx) => (<li key={idx} style={{ color: 'var(--text-muted)' }}>• {item}</li>))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 function Marketing() {
   // Reemplaza logos: quitamos 'Google' genérico y agregamos específicos
   const logos = [
-    { alt: 'Google Ads', src: 'https://logo.clearbit.com/ads.google.com' },
-    { alt: 'Bing Ads', src: 'https://logo.clearbit.com/ads.microsoft.com' },
-    { alt: 'Meta', src: 'https://logo.clearbit.com/meta.com' },
-    { alt: 'Instagram', src: 'https://logo.clearbit.com/instagram.com' },
-    { alt: 'Facebook', src: 'https://logo.clearbit.com/facebook.com' },
-    { alt: 'WhatsApp', src: 'https://logo.clearbit.com/whatsapp.com' },
-    { alt: 'Google Analytics', src: 'https://logo.clearbit.com/marketingplatform.google.com' },
-    { alt: 'Google Tag Manager', src: 'https://logo.clearbit.com/tagmanager.google.com' },
-    { alt: 'Google Search Console', src: 'https://logo.clearbit.com/search.google.com' }
+    { alt: 'Google Ads', src: makeIllustration('Google Ads', { variant: 'square' }) },
+    { alt: 'Bing Ads', src: makeIllustration('Bing Ads', { variant: 'square' }) },
+    { alt: 'Meta', src: makeIllustration('Meta', { variant: 'square' }) },
+    { alt: 'Instagram', src: makeIllustration('Instagram', { variant: 'square' }) },
+    { alt: 'Facebook', src: makeIllustration('Facebook', { variant: 'square' }) },
+    { alt: 'WhatsApp', src: makeIllustration('WhatsApp', { variant: 'square' }) },
+    { alt: 'Google Analytics', src: makeIllustration('Google Analytics', { variant: 'square' }) },
+    { alt: 'Google Tag Manager', src: makeIllustration('Tag Manager', { variant: 'square' }) },
+    { alt: 'Google Search Console', src: makeIllustration('Search Console', { variant: 'square' }) }
   ];
   return (
     <section id="marketing" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
@@ -334,12 +445,12 @@ function Marketing() {
 
 function Metodo() {
   const pasos = [
-    { n: 1, t: '1 Escuchamos las Necesidades del Cliente.', d: 'Para poder arrancar con cualquier proyecto necesitamos saber cuales son las necesides de nuestro clientes y el modo operandi de su negocio, solicitamos toda la información que nos puedan brindar..y ahora es cuando estamos en condiciones de seguir al próximo paso.', img: 'https://source.unsplash.com/800x500/?client,meeting' },
-    { n: 2, t: '2- Analizamos la competencia.', d: 'Comparamos los standares de la competencia para superarlos.', img: 'https://source.unsplash.com/800x500/?analytics,competitor' },
-    { n: 3, t: '3- Estudiamos el Proyecto', d: 'Con la información recopilada, buscamos las mejores estrategias tecnológicas que se adecuen a las necesidades y objetivos de nuestro clientes.', img: 'https://source.unsplash.com/800x500/?planning,technology' },
-    { n: 4, t: '4- Materealizando Objetivos.', d: 'Ponemos Marcha y hacemos maqueta previa según  todo la información obtenida y analizada. Se presenta una primera muestra de lo Trabajado y se abona un 50% del presupuesto.', img: 'https://source.unsplash.com/800x500/?prototype,ui' },
-    { n: 5, t: '5- Conexión con Buscadores y SEO', d: 'Conectamos la web a :\nGoogle Ads (publicidad de Google)\nGoogle Tag Manager.\nGoogle Analitycs.\nGoogle Search Console.\nMeta = Facebook + Instagram + Whatsapp\nBing\nBing Adds (Publicidad de Bing)\nOptimización e Indexación de la Página para reconocimiento prioritario en buscadores.\nY más a medida que se vayan implementando nuevas tecnologías de Marketing.', img: 'https://source.unsplash.com/800x500/?seo,search' },
-    { n: 6, t: '6- Entrega de la web, Puesta a punto y seguimiento mensual.', d: 'Ultimamos detalles.\nSe Abona el 50% del presupuesto restante.\nHacemos entrega de la Página Web y hacemos un segumiento mensual para la implementación de nuevas tecnologías.', img: 'https://source.unsplash.com/800x500/?delivery,launch' }
+    { n: 1, t: '1 Escuchamos las Necesidades del Cliente.', d: 'Para poder arrancar con cualquier proyecto necesitamos saber cuales son las necesides de nuestro clientes y el modo operandi de su negocio, solicitamos toda la información que nos puedan brindar..y ahora es cuando estamos en condiciones de seguir al próximo paso.', img: makeIllustration('Paso 1 Diagnóstico') },
+    { n: 2, t: '2- Analizamos la competencia.', d: 'Comparamos los standares de la competencia para superarlos.', img: makeIllustration('Paso 2 Competencia') },
+    { n: 3, t: '3- Estudiamos el Proyecto', d: 'Con la información recopilada, buscamos las mejores estrategias tecnológicas que se adecuen a las necesidades y objetivos de nuestro clientes.', img: makeIllustration('Paso 3 Estrategia') },
+    { n: 4, t: '4- Materealizando Objetivos.', d: 'Ponemos Marcha y hacemos maqueta previa según  todo la información obtenida y analizada. Se presenta una primera muestra de lo Trabajado y se abona un 50% del presupuesto.', img: makeIllustration('Paso 4 Prototipo') },
+    { n: 5, t: '5- Conexión con Buscadores y SEO', d: 'Conectamos la web a :\nGoogle Ads (publicidad de Google)\nGoogle Tag Manager.\nGoogle Analitycs.\nGoogle Search Console.\nMeta = Facebook + Instagram + Whatsapp\nBing\nBing Adds (Publicidad de Bing)\nOptimización e Indexación de la Página para reconocimiento prioritario en buscadores.\nY más a medida que se vayan implementando nuevas tecnologías de Marketing.', img: makeIllustration('Paso 5 SEO & Ads') },
+    { n: 6, t: '6- Entrega de la web, Puesta a punto y seguimiento mensual.', d: 'Ultimamos detalles.\nSe Abona el 50% del presupuesto restante.\nHacemos entrega de la Página Web y hacemos un segumiento mensual para la implementación de nuevas tecnologías.', img: makeIllustration('Paso 6 Puesta en Marcha') }
   ];
   return (
     <section id="metodo" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
@@ -479,6 +590,7 @@ function ChatBubble({ open, setOpen }) {
                   <button className="btn btn-ghost" onClick={() => setStep('servicios')}>Servicios</button>
                   <button className="btn btn-ghost" onClick={() => setStep('presupuesto')}>Presupuesto</button>
                   <button className="btn btn-ghost" onClick={() => setStep('faq')}>FAQ</button>
+                  <button className="btn btn-ghost" onClick={() => setStep('bot')}>Configurar bot</button>
                 </div>
               </div>
             )}
@@ -495,6 +607,18 @@ function ChatBubble({ open, setOpen }) {
                 <p><strong>¿Publicación?</strong> Preparamos deploy (Vercel) y Play Store.</p>
                 <p><strong>¿Medición?</strong> GA4/GTM/Search Console y KPIs.</p>
                 <button className="btn btn-accent" onClick={() => setStep('lead')}>Quiero que me contacten</button>
+              </div>
+            )}
+            {step === 'bot' && (
+              <div style={{ display: 'grid', gap: 8 }}>
+                <p>Te guiamos rápido:</p>
+                <ol style={{ paddingLeft: 20, display: 'grid', gap: 6 }}>
+                  <li><strong>1.</strong> Reunimos flujos y respuestas clave (FAQ, horarios, precios).</li>
+                  <li><strong>2.</strong> Elegimos canal (WhatsApp, Web) y conectamos tu CRM/Sheets.</li>
+                  <li><strong>3.</strong> Entrenamos al bot, lo probamos con vos y dejamos métricas listas.</li>
+                </ol>
+                <button className="btn btn-accent" onClick={() => setStep('lead')}>Necesito ayuda con mi bot</button>
+                <button className="btn btn-ghost" onClick={() => setStep('root')}>Volver</button>
               </div>
             )}
             {step === 'lead' && <LeadForm onDone={() => setStep('root')} />}
@@ -564,7 +688,7 @@ function runSmokeTests() {
     const estados = ['inicio', 'opciones'];
     console.assert(estados.includes('inicio'), "Estado inicial debe ser 'inicio'");
     setTimeout(() => {
-      const ids = ['hero', 'about', 'services', 'ia', 'marketing', 'metodo'];
+      const ids = ['hero', 'about', 'services', 'ia', 'bot-guide', 'marketing', 'metodo'];
       const missing = ids.filter((id) => !document.getElementById(id));
       if (missing.length) {
         console.warn('Faltan secciones en DOM:', missing);
@@ -630,10 +754,15 @@ export default function App() {
       <Header onGo={onGo} />
       {tab === 'inicio' ? (
         <main>
-          <Hero onOpenOpciones={() => onGo('opciones')} onOpenChat={() => setChatOpen(true)} />
+          <Hero
+            onOpenOpciones={() => onGo('opciones')}
+            onOpenChat={() => setChatOpen(true)}
+            onOpenBotGuide={() => onGo('anchor', '#bot-guide')}
+          />
           <About onOpenOpciones={() => onGo('opciones')} />
           <Services />
           <IAaplicada onOpenOpciones={() => onGo('opciones')} />
+          <BotSetupGuide />
           <Marketing />
           <Metodo />
         </main>
