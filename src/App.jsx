@@ -72,16 +72,35 @@ function makeIllustration(label, { variant = 'landscape' } = {}) {
   return encodeSvg(body);
 }
 
+function SmartImage({ src, alt, label, variant = 'landscape', style, ...rest }) {
+  const [failed, setFailed] = useState(false);
+  const safeLabel = label || alt || 'Imagen';
+  const computed = !failed && src ? src : makeIllustration(safeLabel, { variant });
+  return (
+    <img
+      {...rest}
+      alt={alt}
+      src={computed}
+      style={style}
+      onError={() => {
+        if (!failed) {
+          setFailed(true);
+        }
+      }}
+    />
+  );
+}
+
 function SecurityLayer() {
   useEffect(() => {
     if (typeof document === 'undefined') return undefined;
     const directives = [
       "default-src 'self'",
       "img-src 'self' data: https:",
-      "style-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       `script-src 'self'${isDev ? " 'unsafe-eval'" : ''}`,
       `connect-src 'self' https://wa.me https://api.whatsapp.com${isDev ? ' ws: wss:' : ''}`,
-      "font-src 'self' https: data:",
+      "font-src 'self' https://fonts.gstatic.com https: data:",
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -158,6 +177,7 @@ function SecurityLayer() {
 function FuturisticStyle() {
   return (
     <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
       :root{
         --bg:#0b0d10; --bg-2:#0f1216; --surface:#10151b; --border:#1e2a33;
         --text:#e6f4ff; --text-muted:#a7c2cf;
@@ -171,7 +191,9 @@ function FuturisticStyle() {
           radial-gradient(800px 400px at 10% -80px, rgba(34,204,255,.10), transparent),
           linear-gradient(180deg, var(--bg-2), var(--bg));
         color:var(--text);
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;
+        font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, Roboto, Inter, Arial;
+        font-size:16px;
+        line-height:1.7;
       }
       .wrap{max-width:72rem; margin:0 auto; padding:0 1rem}
       .panel{background:var(--surface); border:1px solid var(--border); border-radius:16px}
@@ -193,6 +215,8 @@ function FuturisticStyle() {
               background:linear-gradient(135deg, rgba(34,204,255,.18), rgba(34,204,255,.06)); overflow:hidden; display:flex; align-items:center; justify-content:center }
       .thumb svg{ width:70%; height:70%; color:var(--text)}
       .thumb-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+      .hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:saturate(1.15); opacity:.38; z-index:0; }
+      .hero-overlay{ position:absolute; inset:0; z-index:0; background:linear-gradient(115deg, rgba(11,13,16,0.9) 0%, rgba(11,13,16,0.75) 45%, rgba(11,13,16,0.35) 100%); }
       /* Método: card = media + contenido */
       .step-card{ display:grid; grid-template-rows:auto 1fr; gap:10px; height:100% }
       .step-media{ border-radius:12px; border:1px solid var(--border); overflow:hidden; aspect-ratio:16/9; background:linear-gradient(135deg, rgba(34,204,255,.12), rgba(34,204,255,.04)) }
@@ -254,19 +278,58 @@ function IcoOptions() {
   return (<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h14v2H3V7Zm0 4h18v2H3v-2Zm0 4h10v2H3v-2Z" /></svg>);
 }
 
+const imageAssets = Object.freeze({
+  aboutHero: 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  services: {
+    'Desarrollo Web': 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    Dominios: 'https://images.pexels.com/photos/3621849/pexels-photo-3621849.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'Apps Android': 'https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'Sistemas a medida': 'https://images.pexels.com/photos/3861972/pexels-photo-3861972.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'SEO + Ads': 'https://images.pexels.com/photos/6476589/pexels-photo-6476589.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    Analítica: 'https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1200'
+  },
+  ia: {
+    Asesoramiento: 'https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'GPTs a medida': 'https://images.pexels.com/photos/8439094/pexels-photo-8439094.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    'Bots conversacionales': 'https://images.pexels.com/photos/5380628/pexels-photo-5380628.jpeg?auto=compress&cs=tinysrgb&w=1200'
+  },
+  botGuide: {
+    '1. Preparamos la información': 'https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '2. Diseñamos el flujo y conectamos canales': 'https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '3. Entrenamos, probamos y lanzamos': 'https://images.pexels.com/photos/6476250/pexels-photo-6476250.jpeg?auto=compress&cs=tinysrgb&w=1200'
+  },
+  metodo: {
+    '1 Escuchamos las Necesidades del Cliente.': 'https://images.pexels.com/photos/3184327/pexels-photo-3184327.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '2- Analizamos la competencia.': 'https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '3- Estudiamos el Proyecto': 'https://images.pexels.com/photos/3184631/pexels-photo-3184631.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '4- Materealizando Objetivos.': 'https://images.pexels.com/photos/3862371/pexels-photo-3862371.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '5- Conexión con Buscadores y SEO': 'https://images.pexels.com/photos/907607/pexels-photo-907607.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '6- Entrega de la web, Puesta a punto y seguimiento mensual.': 'https://images.pexels.com/photos/3183172/pexels-photo-3183172.jpeg?auto=compress&cs=tinysrgb&w=1200'
+  }
+});
+
 /* =====================
    4) Hero con 3 botones
    ===================== */
-const heroImage = makeIllustration('Equipo Ranquel');
+const heroImage = imageAssets.aboutHero;
 
 function Hero({ onOpenOpciones, onOpenChat, onOpenBotGuide }) {
   const wa = '#'; // TODO: reemplazar por https://wa.me/XXXXXXXXXXX
   return (
     <section id="hero" style={{ position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--border)' }}>
-      <div className="wrap" style={{ paddingTop: 112, paddingBottom: 80 }}>
+      <SmartImage
+        aria-hidden="true"
+        className="hero-bg"
+        alt=""
+        src={heroImage}
+        label="Ranquel Tech Lab"
+        variant="landscape"
+      />
+      <div aria-hidden="true" className="hero-overlay" />
+      <div className="wrap" style={{ position: 'relative', zIndex: 1, paddingTop: 112, paddingBottom: 80 }}>
         <span className="badge">En la cúspide de la tecnología</span>
         <h1 className="neon" style={{ fontSize: 'clamp(32px,6vw,56px)', fontWeight: 800, letterSpacing: 0.2, marginTop: 12 }}>Creamos software inteligente que impulsa tu negocio.</h1>
-        <p style={{ marginTop: 12, color: 'var(--text-muted)', maxWidth: 720, fontSize: 18 }}>Desarrollo Web, Apps Android y Automatizaciones con IA. SEO, analítica y performance listos desde el día uno.</p>
+        <p style={{ marginTop: 12, color: 'var(--text-muted)', maxWidth: 720, fontSize: 19 }}>Desarrollo Web, Apps Android y Automatizaciones con IA. SEO, analítica y performance listos desde el día uno.</p>
         <div style={{ marginTop: 24, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
           <a href={wa} className="btn btn-accent glow"><IcoWhatsApp /> WhatsApp</a>
           <button onClick={onOpenOpciones} className="btn btn-ghost"><IcoOptions /> Opciones de Desarrollo</button>
@@ -291,7 +354,7 @@ function About({ onOpenOpciones }) {
           <p style={{ marginTop: 10, color: 'var(--text-muted)' }}>Porque todo se puede <strong>Codificar</strong>, podemos diseñar el software a medida que necesites. Nos comentás dónde está tu cuello de botella o tu necesidad de mejora, analizamos la situación y damos soluciones.</p>
           <div style={{ marginTop: 16 }}><button onClick={onOpenOpciones} className="btn btn-accent glow">Conocé Opciones de Desarrollo</button></div>
         </div>
-        <div className="thumb"><img className="thumb-img" alt="Equipo de trabajo tecnológico" src={heroImage} /></div>
+        <div className="thumb"><SmartImage className="thumb-img" alt="Equipo de trabajo tecnológico" src={heroImage} label="Equipo de trabajo" loading="lazy" /></div>
       </div>
     </section>
   );
@@ -299,12 +362,12 @@ function About({ onOpenOpciones }) {
 
 function Services() {
   const items = [
-    { title: 'Desarrollo Web', desc: 'SEO, performance, e‑commerce y landings rápidas.', img: makeIllustration('Desarrollo Web') },
-    { title: 'Dominios', desc: 'Nos encargamos de tu hosting y del dominio que necesitás para tu web.', img: makeIllustration('Dominios y Hosting') },
-    { title: 'Apps Android', desc: 'Java/Kotlin, publicación en Play Store.', img: makeIllustration('Apps Android') },
-    { title: 'Sistemas a medida', desc: 'Java/Node.js, dashboards y microservicios.', img: makeIllustration('Sistemas a Medida') },
-    { title: 'SEO + Ads', desc: 'Google/Meta con medición y experimentos.', img: makeIllustration('SEO + ADS') },
-    { title: 'Analítica', desc: 'GA4, GTM, Search Console y Bing Webmaster.', img: makeIllustration('Analítica Digital') }
+    { title: 'Desarrollo Web', desc: 'SEO, performance, e‑commerce y landings rápidas.' },
+    { title: 'Dominios', desc: 'Nos encargamos de tu hosting y del dominio que necesitás para tu web.' },
+    { title: 'Apps Android', desc: 'Java/Kotlin, publicación en Play Store.' },
+    { title: 'Sistemas a medida', desc: 'Java/Node.js, dashboards y microservicios.' },
+    { title: 'SEO + Ads', desc: 'Google/Meta con medición y experimentos.' },
+    { title: 'Analítica', desc: 'GA4, GTM, Search Console y Bing Webmaster.' }
   ];
   return (
     <section id="services" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
@@ -312,7 +375,7 @@ function Services() {
       <div className="grid grid-3" style={{ marginTop: 24 }}>
         {items.map((it) => (
           <article key={it.title} className="panel glow step-card" style={{ padding: 16 }}>
-            <div className="step-media"><img className="thumb-img" alt={it.title} src={it.img} /></div>
+            <div className="step-media"><SmartImage className="thumb-img" alt={it.title} src={imageAssets.services[it.title]} label={it.title} loading="lazy" /></div>
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700 }}>{it.title}</h3>
               <p style={{ marginTop: 8, color: 'var(--text-muted)' }}>{it.desc}</p>
@@ -341,11 +404,7 @@ function IAaplicada({ onOpenOpciones }) {
     { title: 'GPTs a medida', desc: 'Creamos asistentes con el contexto de tu negocio (documentos, políticas, catálogos) y reglas propias. Se conectan a tus sistemas (ERP/CRM/AFIP/Sheets) para automatizar tareas, responder con trazabilidad y ejecutar flujos end-to-end.' },
     { title: 'Bots conversacionales', desc: 'Web/WhatsApp/Instagram que atienden, reservan, cobran y escalan a un humano cuando corresponde. Entrenados con tu contenido, con analytics de conversaciones y mejoras continuas para elevar la experiencia del cliente.' }
   ];
-  const pics = {
-    Asesoramiento: makeIllustration('Asesoramiento IA'),
-    'GPTs a medida': makeIllustration('GPTs a Medida'),
-    'Bots conversacionales': makeIllustration('Bots Conversacionales')
-  };
+  const pics = imageAssets.ia;
   return (
     <section id="ia" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
       <div style={{ textAlign: 'center' }}>
@@ -355,7 +414,7 @@ function IAaplicada({ onOpenOpciones }) {
       <div className="grid grid-3" style={{ marginTop: 24 }}>
         {cards.map(({ title, desc }) => (
           <article key={title} className="panel glow step-card" style={{ padding: 16 }}>
-            <div className="step-media"><img className="thumb-img" alt={title} src={pics[title]} /></div>
+            <div className="step-media"><SmartImage className="thumb-img" alt={title} src={pics[title]} label={title} loading="lazy" /></div>
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700 }}>{title}</h3>
               <p style={{ color: 'var(--text-muted)' }}>{desc}</p>
@@ -388,16 +447,17 @@ function BotSetupGuide() {
     'Plantilla de guion de conversación (Google Docs).',
     'Tablero inicial en Sheets para medir leads y derivaciones.'
   ];
+  const pics = imageAssets.botGuide;
   return (
     <section id="bot-guide" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
       <div style={{ textAlign: 'center' }}>
-        <h2 className="neon" style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800 }}>Configurá tu bot en 3 pasos</h2>
-        <p style={{ marginTop: 12, color: 'var(--text-muted)' }}>Nunca configuraste un bot? Te acompañamos con materiales listos para que avances sin trabas. Seguimos juntos cada paso hasta que esté atendiendo clientes reales.</p>
+        <h2 className="neon" style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800 }}>Configuramos tu Bot en 3 pasos</h2>
+        <p style={{ marginTop: 12, color: 'var(--text-muted)' }}>Rápido y Preciso, justo lo que necesitás para ahorrarte horas de trabajo administrativo.</p>
       </div>
       <div className="grid grid-3" style={{ marginTop: 24 }}>
         {steps.map(({ title, detail }) => (
           <article key={title} className="panel glow step-card" style={{ padding: 18 }}>
-            <div className="step-media"><img className="thumb-img" alt={title} src={makeIllustration(title)} /></div>
+            <div className="step-media"><SmartImage className="thumb-img" alt={title} src={pics[title]} label={title} loading="lazy" /></div>
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 700 }}>{title}</h3>
               <p style={{ marginTop: 8, color: 'var(--text-muted)' }}>{detail}</p>
@@ -416,26 +476,41 @@ function BotSetupGuide() {
 }
 
 function Marketing() {
-  // Reemplaza logos: quitamos 'Google' genérico y agregamos específicos
+  const base = (typeof import.meta !== 'undefined' && import.meta?.env?.BASE_URL) ? import.meta.env.BASE_URL : '/';
   const logos = [
-    { alt: 'Google Ads', src: makeIllustration('Google Ads', { variant: 'square' }) },
-    { alt: 'Bing Ads', src: makeIllustration('Bing Ads', { variant: 'square' }) },
-    { alt: 'Meta', src: makeIllustration('Meta', { variant: 'square' }) },
-    { alt: 'Instagram', src: makeIllustration('Instagram', { variant: 'square' }) },
-    { alt: 'Facebook', src: makeIllustration('Facebook', { variant: 'square' }) },
-    { alt: 'WhatsApp', src: makeIllustration('WhatsApp', { variant: 'square' }) },
-    { alt: 'Google Analytics', src: makeIllustration('Google Analytics', { variant: 'square' }) },
-    { alt: 'Google Tag Manager', src: makeIllustration('Tag Manager', { variant: 'square' }) },
-    { alt: 'Google Search Console', src: makeIllustration('Search Console', { variant: 'square' }) }
+    { alt: 'Google Ads', src: `${base}logos/google-ads.svg`, color: '#4285F4' },
+    { alt: 'Microsoft Advertising', src: `${base}logos/microsoft-advertising.svg`, color: '#0078D4' },
+    { alt: 'Meta', src: `${base}logos/meta.svg`, color: '#0081FB' },
+    { alt: 'Instagram', src: `${base}logos/instagram.svg`, color: '#C13584' },
+    { alt: 'Facebook', src: `${base}logos/facebook.svg`, color: '#0866FF' },
+    { alt: 'WhatsApp', src: `${base}logos/whatsapp.svg`, color: '#25D366' },
+    { alt: 'Google Analytics', src: `${base}logos/google-analytics.svg`, color: '#E37400' },
+    { alt: 'Google Tag Manager', src: `${base}logos/google-tag-manager.svg`, color: '#4285F4' },
+    { alt: 'Google Search Console', src: `${base}logos/google-search-console.svg`, color: '#1A73E8' }
   ];
   return (
     <section id="marketing" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
       <h2 className="neon" style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 800, textAlign: 'center' }}>Marketing</h2>
-      <p style={{ marginTop: 12, color: 'var(--text-muted)', maxWidth: 960 }}>Con 13 años de experiencia en Marketing Digital podemos hacerte campañas de Google Ads, Bing Ads, Meta Pixel (Instagram, Facebook, Whatsapp). Tu Costo publicitario Nunca Rendirá más que contratando nuestros servicios, con métricas comprobables.</p>
+      <p style={{ marginTop: 12, color: 'var(--text-muted)', maxWidth: 960, textAlign: 'center', marginInline: 'auto' }}>Con 13 años de experiencia en Marketing Digital podemos hacerte campañas de Google Ads, Bing Ads, Meta Pixel (Instagram, Facebook, Whatsapp). Tu Costo publicitario nunca rendirá más que contratando nuestros servicios, con métricas comprobables.</p>
       <div style={{ marginTop: 20, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
         {logos.map((l) => (
-          <div key={l.alt} className="panel" style={{ padding: '10px 12px', borderRadius: 12 }}>
-            <img alt={l.alt} src={l.src} style={{ width: 64, height: 64, objectFit: 'contain', display: 'block' }} />
+          <div
+            key={l.alt}
+            className="panel"
+            style={{
+              padding: '14px 18px',
+              borderRadius: 14,
+              background: `linear-gradient(135deg, ${l.color} 0%, ${l.color}aa 100%)`,
+              border: 'none',
+              boxShadow: '0 12px 30px rgba(0,0,0,0.25)'
+            }}
+          >
+            <img
+              alt={l.alt}
+              src={l.src}
+              style={{ width: 56, height: 56, objectFit: 'contain', display: 'block', filter: 'invert(1)' }}
+              loading="lazy"
+            />
           </div>
         ))}
       </div>
@@ -445,12 +520,12 @@ function Marketing() {
 
 function Metodo() {
   const pasos = [
-    { n: 1, t: '1 Escuchamos las Necesidades del Cliente.', d: 'Para poder arrancar con cualquier proyecto necesitamos saber cuales son las necesides de nuestro clientes y el modo operandi de su negocio, solicitamos toda la información que nos puedan brindar..y ahora es cuando estamos en condiciones de seguir al próximo paso.', img: makeIllustration('Paso 1 Diagnóstico') },
-    { n: 2, t: '2- Analizamos la competencia.', d: 'Comparamos los standares de la competencia para superarlos.', img: makeIllustration('Paso 2 Competencia') },
-    { n: 3, t: '3- Estudiamos el Proyecto', d: 'Con la información recopilada, buscamos las mejores estrategias tecnológicas que se adecuen a las necesidades y objetivos de nuestro clientes.', img: makeIllustration('Paso 3 Estrategia') },
-    { n: 4, t: '4- Materealizando Objetivos.', d: 'Ponemos Marcha y hacemos maqueta previa según  todo la información obtenida y analizada. Se presenta una primera muestra de lo Trabajado y se abona un 50% del presupuesto.', img: makeIllustration('Paso 4 Prototipo') },
-    { n: 5, t: '5- Conexión con Buscadores y SEO', d: 'Conectamos la web a :\nGoogle Ads (publicidad de Google)\nGoogle Tag Manager.\nGoogle Analitycs.\nGoogle Search Console.\nMeta = Facebook + Instagram + Whatsapp\nBing\nBing Adds (Publicidad de Bing)\nOptimización e Indexación de la Página para reconocimiento prioritario en buscadores.\nY más a medida que se vayan implementando nuevas tecnologías de Marketing.', img: makeIllustration('Paso 5 SEO & Ads') },
-    { n: 6, t: '6- Entrega de la web, Puesta a punto y seguimiento mensual.', d: 'Ultimamos detalles.\nSe Abona el 50% del presupuesto restante.\nHacemos entrega de la Página Web y hacemos un segumiento mensual para la implementación de nuevas tecnologías.', img: makeIllustration('Paso 6 Puesta en Marcha') }
+    { n: 1, t: '1 Escuchamos las Necesidades del Cliente.', d: 'Para poder arrancar con cualquier proyecto necesitamos saber cuales son las necesides de nuestro clientes y el modo operandi de su negocio, solicitamos toda la información que nos puedan brindar..y ahora es cuando estamos en condiciones de seguir al próximo paso.' },
+    { n: 2, t: '2- Analizamos la competencia.', d: 'Comparamos los standares de la competencia para superarlos.' },
+    { n: 3, t: '3- Estudiamos el Proyecto', d: 'Con la información recopilada, buscamos las mejores estrategias tecnológicas que se adecuen a las necesidades y objetivos de nuestro clientes.' },
+    { n: 4, t: '4- Materealizando Objetivos.', d: 'Ponemos Marcha y hacemos maqueta previa según  todo la información obtenida y analizada. Se presenta una primera muestra de lo Trabajado y se abona un 50% del presupuesto.' },
+    { n: 5, t: '5- Conexión con Buscadores y SEO', d: 'Conectamos la web a :\nGoogle Ads (publicidad de Google)\nGoogle Tag Manager.\nGoogle Analitycs.\nGoogle Search Console.\nMeta = Facebook + Instagram + Whatsapp\nBing\nBing Adds (Publicidad de Bing)\nOptimización e Indexación de la Página para reconocimiento prioritario en buscadores.\nY más a medida que se vayan implementando nuevas tecnologías de Marketing.' },
+    { n: 6, t: '6- Entrega de la web, Puesta a punto y seguimiento mensual.', d: 'Ultimamos detalles.\nSe Abona el 50% del presupuesto restante.\nHacemos entrega de la Página Web y hacemos un segumiento mensual para la implementación de nuevas tecnologías.' }
   ];
   return (
     <section id="metodo" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
@@ -462,7 +537,7 @@ function Metodo() {
           return (
             <article key={idx} className={`panel glow step-shell ${right ? 'step-right' : 'step-left'}`} style={{ padding: 16 }}>
               <div className="step-card">
-                <div className="step-media"><img className="thumb-img" alt={`Paso ${p.n}`} src={p.img} /></div>
+                <div className="step-media"><SmartImage className="thumb-img" alt={`Paso ${p.n}`} src={imageAssets.metodo[p.t]} label={`Paso ${p.n}`} loading="lazy" /></div>
                 <div>
                   <div className="badge" aria-hidden="true">Paso {p.n}</div>
                   <h3 style={{ fontWeight: 700, marginTop: 8 }}>{p.t}</h3>
