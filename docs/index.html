@@ -13,15 +13,139 @@
       (() => {
         const moduleScript = document.querySelector('script[type="module"][src]');
         const baseURL = moduleScript ? new URL('..', moduleScript.src) : new URL('./', window.location.href);
-        const encodeRelative = (relativePath) => relativePath.split('/').map((segment) => encodeURIComponent(segment)).join('/');
-        const toUrl = (relativePath) => new URL(encodeRelative(relativePath), baseURL).toString();
+        const encodeRelative = (relativePath) =>
+          relativePath
+            .split('/')
+            .map((segment) => encodeURIComponent(segment))
+            .join('/');
+        const resolve = (relativePath) => {
+          try {
+            return new URL(encodeRelative(relativePath), baseURL).toString();
+          } catch {
+            return relativePath;
+          }
+        };
+
+        const ensureStyle = () => {
+          if (document.getElementById('rtl-overrides')) return;
+          const style = document.createElement('style');
+          style.id = 'rtl-overrides';
+          style.textContent = `
+            :root{
+              --bg:#131d27;
+              --bg-2:#16232f;
+              --surface:rgba(17,27,38,0.82);
+              --border:rgba(255,255,255,0.16);
+              --text:#f5fbff;
+              --text-muted:#c7d8e4;
+              --accent:#48d4ff;
+              --accent-600:#2cc1f0;
+              --accent-700:#16a8d8;
+            }
+            body{
+              background:
+                radial-gradient(1200px 720px at 18% -140px, rgba(72,212,255,0.35), transparent),
+                radial-gradient(960px 580px at 86% -160px, rgba(72,212,255,0.28), transparent),
+                linear-gradient(185deg, rgba(19,29,39,0.95), rgba(9,16,24,0.92));
+              color:var(--text);
+            }
+            .panel{
+              background:rgba(12,20,30,0.8) !important;
+              border-color:rgba(255,255,255,0.12) !important;
+              box-shadow:0 20px 44px rgba(6,12,20,0.48) !important;
+            }
+            #hero .panel{
+              background:rgba(10,18,28,0.78) !important;
+            }
+            #marketing .panel{
+              background:rgba(14,24,35,0.88) !important;
+            }
+            #marketing .panel img{
+              filter:drop-shadow(0 4px 12px rgba(0,0,0,0.45));
+            }
+            .hero-overlay{
+              background:linear-gradient(118deg, rgba(11,17,26,0.84) 0%, rgba(11,17,26,0.6) 46%, rgba(11,17,26,0.22) 100%) !important;
+            }
+            .hero-bg{
+              opacity:.4 !important;
+              filter:saturate(1.08) brightness(1.12) !important;
+            }
+            .badge{
+              background:linear-gradient(90deg, rgba(72,212,255,0.32), rgba(72,212,255,0.12)) !important;
+            }
+            .rtl-btn-icon{
+              width:22px;
+              height:22px;
+              object-fit:contain;
+            }
+            .btn .rtl-btn-icon + span,
+            .btn .rtl-chat-icon + span{
+              margin-left:8px;
+            }
+            #hero .btn .rtl-chat-icon{
+              width:22px;
+              height:22px;
+              margin-right:0;
+            }
+            .rtl-sr-only{
+              position:absolute;
+              width:1px;
+              height:1px;
+              padding:0;
+              margin:-1px;
+              overflow:hidden;
+              clip:rect(0,0,0,0);
+              white-space:nowrap;
+              border:0;
+            }
+            #chat{
+              filter:drop-shadow(0 18px 36px rgba(6,16,26,0.45));
+            }
+            #chat > button{
+              width:68px;
+              height:68px;
+              border-radius:9999px !important;
+              padding:0 !important;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              background:linear-gradient(135deg, rgba(72,212,255,0.95), rgba(35,148,255,0.95)) !important;
+              border:1px solid rgba(255,255,255,0.18) !important;
+              box-shadow:0 22px 44px rgba(4,12,22,0.5), 0 0 24px rgba(72,212,255,0.45) !important;
+              transition:transform .25s ease, box-shadow .25s ease;
+            }
+            #chat > button:hover{
+              transform:translateY(-4px);
+              box-shadow:0 28px 52px rgba(4,12,22,0.5),0 0 30px rgba(72,212,255,0.55) !important;
+            }
+            #chat > button:active{
+              transform:translateY(-1px);
+            }
+            #chat > button svg{
+              width:30px;
+              height:30px;
+            }
+            .rtl-reveal{
+              opacity:0;
+              transform:translateY(70px);
+              transition:opacity .9s ease, transform .9s cubic-bezier(.25,.1,.25,1);
+            }
+            .rtl-reveal.is-visible{
+              opacity:1;
+              transform:none;
+            }
+          `;
+          document.head.appendChild(style);
+        };
+
         const directSelectors = new Map([
           ['img.hero-bg', 'images/Portada.jpg']
         ]);
+
         const altMap = new Map([
-          ['Equipo de trabajo tecnológico', 'images/Asesoramiento.jpg'],
+          ['Equipo de trabajo tecnológico', 'images/logo.png'],
           ['Desarrollo Web', 'images/ChatGPT Image 13 nov 2025, 01_45_44 a.m..png'],
-          ['Dominios', 'images/Portada.jpg'],
+          ['Dominios', 'images/Dominios.webp'],
           ['Apps Android', 'images/Apps Android.jpg'],
           ['Sistemas a medida', 'images/Sistemas a Medida.jpg'],
           ['SEO + Ads', 'images/SEO + Ads.jpg'],
@@ -51,16 +175,169 @@
 
         const assignSrc = (img, relativePath) => {
           if (!img || !relativePath) return;
-          const target = toUrl(relativePath);
+          const target = resolve(relativePath);
           if (img.getAttribute('data-local-img') === target) return;
           img.src = target;
           img.setAttribute('data-local-img', target);
           if (!img.hasAttribute('loading')) {
             img.setAttribute('loading', 'lazy');
           }
+          if (!img.hasAttribute('decoding')) {
+            img.setAttribute('decoding', 'async');
+          }
+        };
+
+        const brandButtonMap = [
+          { match: 'whatsapp', asset: 'logos/whatsapp.svg' }
+        ];
+
+        const NS = 'http://www.w3.org/2000/svg';
+
+        const createBubbleIcon = () => {
+          const svg = document.createElementNS(NS, 'svg');
+          svg.setAttribute('viewBox', '0 0 24 24');
+          svg.setAttribute('aria-hidden', 'true');
+          svg.classList.add('rtl-chat-icon');
+          const body = document.createElementNS(NS, 'path');
+          body.setAttribute('fill', 'currentColor');
+          body.setAttribute(
+            'd',
+            'M4.25 3.5h15.5A2.25 2.25 0 0 1 22 5.75v7.75a2.25 2.25 0 0 1-2.25 2.25h-6.15l-4.72 3.75a.9.9 0 0 1-1.47-.7v-3.05H4.25A2.25 2.25 0 0 1 2 13.5V5.75A2.25 2.25 0 0 1 4.25 3.5Z'
+          );
+          svg.appendChild(body);
+          [7, 12, 17].forEach((cx) => {
+            const dot = document.createElementNS(NS, 'circle');
+            dot.setAttribute('cx', cx.toString());
+            dot.setAttribute('cy', '10.5');
+            dot.setAttribute('r', '1.15');
+            dot.setAttribute('fill', 'rgba(255,255,255,0.6)');
+            svg.appendChild(dot);
+          });
+          return svg;
+        };
+
+        const ensureHeroButtons = () => {
+          const hero = document.getElementById('hero');
+          if (!hero) return;
+          const buttons = hero.querySelectorAll('.btn');
+          buttons.forEach((btn) => {
+            const text = (btn.textContent || '').trim();
+            const lower = text.toLowerCase();
+            const match = brandButtonMap.find((item) => lower.includes(item.match));
+            if (match) {
+              if (!btn.querySelector('.rtl-btn-icon')) {
+                const icon = document.createElement('img');
+                icon.className = 'rtl-btn-icon';
+                icon.alt = '';
+                icon.setAttribute('aria-hidden', 'true');
+                icon.src = resolve(match.asset);
+                const label = document.createElement('span');
+                label.textContent = text;
+                btn.textContent = '';
+                btn.append(icon, label);
+              } else {
+                const icon = btn.querySelector('.rtl-btn-icon');
+                icon.src = resolve(match.asset);
+              }
+            } else if (lower.includes('chat bot')) {
+              const existing = btn.querySelector('.rtl-chat-icon');
+              if (!existing) {
+                const label = document.createElement('span');
+                label.textContent = text;
+                btn.textContent = '';
+                btn.append(createBubbleIcon(), label);
+              }
+            }
+          });
+        };
+
+        const removeBotCta = () => {
+          const hero = document.getElementById('hero');
+          if (!hero) return;
+          const target = Array.from(hero.querySelectorAll('button')).find(
+            (btn) => (btn.textContent || '').trim().toLowerCase() === 'configurar mi bot'
+          );
+          if (target) {
+            target.remove();
+          }
+        };
+
+        const ensureChatBubble = () => {
+          const wrapper = document.getElementById('chat');
+          if (!wrapper) return;
+          const btn = wrapper.querySelector('button');
+          if (!btn) return;
+          if (!btn.querySelector('.rtl-chat-icon')) {
+            btn.textContent = '';
+            btn.append(createBubbleIcon());
+            const sr = document.createElement('span');
+            sr.className = 'rtl-sr-only';
+            sr.textContent = 'Abrir chat';
+            btn.append(sr);
+          }
+          const srOnly = btn.querySelector('.rtl-sr-only');
+          const panelOpen = wrapper.querySelector('.panel') !== null;
+          btn.setAttribute('aria-label', panelOpen ? 'Cerrar chat' : 'Abrir chat');
+          if (srOnly) {
+            srOnly.textContent = panelOpen ? 'Cerrar chat' : 'Abrir chat';
+          }
+        };
+
+        const revealObserver =
+          'IntersectionObserver' in window
+            ? new IntersectionObserver(
+                (entries) => {
+                  entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                      entry.target.classList.add('is-visible');
+                      revealObserver.unobserve(entry.target);
+                    }
+                  });
+                },
+                { threshold: 0.2, rootMargin: '0px 0px -10%' }
+              )
+            : null;
+
+        const markReveal = (el, delay = 0) => {
+          if (!el) return;
+          if (!el.classList.contains('rtl-reveal')) {
+            el.classList.add('rtl-reveal');
+          }
+          el.style.setProperty('--rtl-delay', `${delay}s`);
+          if (revealObserver && !el.dataset.rtlReveal) {
+            el.dataset.rtlReveal = 'true';
+            revealObserver.observe(el);
+          } else if (!revealObserver) {
+            el.classList.add('is-visible');
+          }
+        };
+
+        const ensureReveals = () => {
+          const sections = Array.from(document.querySelectorAll('#root section')).filter(
+            (section) => section.id && section.id !== 'hero'
+          );
+          sections.forEach((section, idx) => markReveal(section, Math.min(idx * 0.1, 0.4)));
+
+          const map = [
+            ['#about .about-grid > *', 0.05],
+            ['#services article', 0.06],
+            ['#ia article', 0.06],
+            ['#bot-guide article', 0.06],
+            ['#marketing .panel', 0.05],
+            ['#metodo article', 0.05],
+            ['#opciones article', 0.05],
+            ['footer .panel, footer .cta-rail', 0.05]
+          ];
+
+          map.forEach(([selector, step]) => {
+            Array.from(document.querySelectorAll(selector)).forEach((node, idx) => {
+              markReveal(node, 0.1 + idx * step);
+            });
+          });
         };
 
         const apply = () => {
+          ensureStyle();
           directSelectors.forEach((relativePath, selector) => {
             document.querySelectorAll(selector).forEach((img) => assignSrc(img, relativePath));
           });
@@ -72,6 +349,10 @@
               assignSrc(img, relativePath);
             }
           });
+          removeBotCta();
+          ensureHeroButtons();
+          ensureChatBubble();
+          ensureReveals();
         };
 
         const root = document.getElementById('root');
@@ -81,7 +362,7 @@
         }
 
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', apply, { once: true });
+          document.addEventListener('DOMContentLoaded', () => apply(), { once: true });
         } else {
           apply();
         }
