@@ -632,9 +632,15 @@ function ChatBubble({ open, setOpen }) {
 
 // Sanitizador simple
 function sanitize(str) {
-  const div = document.createElement('div');
-  div.textContent = str ?? '';
-  return div.innerHTML;
+  const value = (str ?? '').toString();
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return value.replace(/[&<>"']/g, (ch) => map[ch]);
 }
 
 function LeadForm({ onDone }) {
@@ -680,6 +686,7 @@ function LeadForm({ onDone }) {
    ===================== */
 function runSmokeTests() {
   try {
+    if (typeof document === 'undefined') return;
     console.group('RTL Smoke Tests');
     const iaCards = ['Asesoramiento', 'GPTs a medida', 'Bots conversacionales'];
     console.assert(iaCards.length === 3, 'IA aplicada: cantidad de tarjetas incorrecta');
