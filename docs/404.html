@@ -9,5 +9,83 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (() => {
+        const moduleScript = document.querySelector('script[type="module"][src]');
+        const baseURL = moduleScript ? new URL('..', moduleScript.src) : new URL('./', window.location.href);
+        const encodeRelative = (relativePath) => relativePath.split('/').map((segment) => encodeURIComponent(segment)).join('/');
+        const toUrl = (relativePath) => new URL(encodeRelative(relativePath), baseURL).toString();
+        const directSelectors = new Map([
+          ['img.hero-bg', 'images/Portada.jpg']
+        ]);
+        const altMap = new Map([
+          ['Equipo de trabajo tecnológico', 'images/Asesoramiento.jpg'],
+          ['Desarrollo Web', 'images/ChatGPT Image 13 nov 2025, 01_45_44 a.m..png'],
+          ['Dominios', 'images/Portada.jpg'],
+          ['Apps Android', 'images/Apps Android.jpg'],
+          ['Sistemas a medida', 'images/Sistemas a Medida.jpg'],
+          ['SEO + Ads', 'images/SEO + Ads.jpg'],
+          ['Analítica', 'images/Analitica.jpg'],
+          ['Asesoramiento', 'images/Asesoramiento.jpg'],
+          ['GPTs a medida', 'images/GPTs A medida.jpg'],
+          ['Bots conversacionales', 'images/Bots Conversacionales.jpg'],
+          ['1. Preparamos la información', 'images/Preparamos la Información.png'],
+          ['2. Diseñamos el flujo y conectamos canales', 'images/Diseñamos Flujo Conectamos Canales.png'],
+          ['3. Entrenamos, probamos y lanzamos', 'images/Entrenamos Probamos y Lanzamos.png'],
+          ['Paso 1', 'images/Escuchamos las necesidades del cliente.png'],
+          ['Paso 2', 'images/Analizamos la competencia.png'],
+          ['Paso 3', 'images/Estudiamos el Proyecto.png'],
+          ['Paso 4', 'images/Materealizando Objetivos.png'],
+          ['Paso 5', 'images/Conexion buscadores seo.png'],
+          ['Paso 6', 'images/Entrega de la web, Puesta a punto y seguimiento mensual..png'],
+          ['Google Ads', 'logos/google-ads.svg'],
+          ['Microsoft Advertising', 'logos/microsoft-advertising.svg'],
+          ['Meta', 'logos/meta.svg'],
+          ['Instagram', 'logos/instagram.svg'],
+          ['Facebook', 'logos/facebook.svg'],
+          ['WhatsApp', 'logos/whatsapp.svg'],
+          ['Google Analytics', 'logos/google-analytics.svg'],
+          ['Google Tag Manager', 'logos/google-tag-manager.svg'],
+          ['Google Search Console', 'logos/google-search-console.svg']
+        ]);
+
+        const assignSrc = (img, relativePath) => {
+          if (!img || !relativePath) return;
+          const target = toUrl(relativePath);
+          if (img.getAttribute('data-local-img') === target) return;
+          img.src = target;
+          img.setAttribute('data-local-img', target);
+          if (!img.hasAttribute('loading')) {
+            img.setAttribute('loading', 'lazy');
+          }
+        };
+
+        const apply = () => {
+          directSelectors.forEach((relativePath, selector) => {
+            document.querySelectorAll(selector).forEach((img) => assignSrc(img, relativePath));
+          });
+          document.querySelectorAll('img[alt]').forEach((img) => {
+            const alt = (img.getAttribute('alt') || '').trim();
+            if (!alt) return;
+            const relativePath = altMap.get(alt);
+            if (relativePath) {
+              assignSrc(img, relativePath);
+            }
+          });
+        };
+
+        const root = document.getElementById('root');
+        if (root) {
+          const observer = new MutationObserver(() => apply());
+          observer.observe(root, { childList: true, subtree: true });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', apply, { once: true });
+        } else {
+          apply();
+        }
+      })();
+    </script>
   </body>
 </html>
