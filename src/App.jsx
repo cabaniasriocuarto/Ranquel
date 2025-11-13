@@ -207,7 +207,8 @@ function FuturisticStyle() {
       .badge{ display:inline-block; border:1px solid var(--border); padding:.25rem .6rem; border-radius:999px; background:linear-gradient(90deg, rgba(34,204,255,.18), rgba(34,204,255,.05)); color:var(--text)}
       .grid{display:grid; gap:1rem}
       @media(min-width:640px){ .grid-2{grid-template-columns:repeat(2,1fr)} }
-      @media(min-width:1024px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
+      @media(min-width:720px){ .grid-3{grid-template-columns:repeat(2,1fr)} }
+      @media(min-width:1080px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
       header.backdrop{backdrop-filter:saturate(150%) blur(10px); background:rgba(15,18,22,.65)}
       a:focus, button:focus{outline:2px solid var(--accent); outline-offset:3px; border-radius:10px}
       /* Medios 16:9 */
@@ -215,11 +216,11 @@ function FuturisticStyle() {
               background:linear-gradient(135deg, rgba(34,204,255,.18), rgba(34,204,255,.06)); overflow:hidden; display:flex; align-items:center; justify-content:center }
       .thumb svg{ width:70%; height:70%; color:var(--text)}
       .thumb-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-      .hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:saturate(1.15); opacity:.38; z-index:0; }
+      .hero-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:saturate(1.05); opacity:.22; z-index:0; }
       .hero-overlay{ position:absolute; inset:0; z-index:0; background:linear-gradient(115deg, rgba(11,13,16,0.9) 0%, rgba(11,13,16,0.75) 45%, rgba(11,13,16,0.35) 100%); }
       /* Método: card = media + contenido */
       .step-card{ display:grid; grid-template-rows:auto 1fr; gap:10px; height:100% }
-      .step-media{ border-radius:12px; border:1px solid var(--border); overflow:hidden; aspect-ratio:16/9; background:linear-gradient(135deg, rgba(34,204,255,.12), rgba(34,204,255,.04)) }
+      .step-media{ position:relative; border-radius:12px; border:1px solid var(--border); overflow:hidden; aspect-ratio:16/9; background:linear-gradient(135deg, rgba(34,204,255,.12), rgba(34,204,255,.04)) }
       /* About grid */
       .about-grid{ display:grid; gap:16px }
       @media(min-width:900px){ .about-grid{ grid-template-columns:1.2fr 1fr } }
@@ -295,13 +296,13 @@ const imageAssets = Object.freeze({
   },
   botGuide: {
     '1. Preparamos la información': 'https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    '2. Diseñamos el flujo y conectamos canales': 'https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '2. Diseñamos el flujo y conectamos canales': 'https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=1200',
     '3. Entrenamos, probamos y lanzamos': 'https://images.pexels.com/photos/6476250/pexels-photo-6476250.jpeg?auto=compress&cs=tinysrgb&w=1200'
   },
   metodo: {
     '1 Escuchamos las Necesidades del Cliente.': 'https://images.pexels.com/photos/3184327/pexels-photo-3184327.jpeg?auto=compress&cs=tinysrgb&w=1200',
     '2- Analizamos la competencia.': 'https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    '3- Estudiamos el Proyecto': 'https://images.pexels.com/photos/3184631/pexels-photo-3184631.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    '3- Estudiamos el Proyecto': 'https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg?auto=compress&cs=tinysrgb&w=1200',
     '4- Materealizando Objetivos.': 'https://images.pexels.com/photos/3862371/pexels-photo-3862371.jpeg?auto=compress&cs=tinysrgb&w=1200',
     '5- Conexión con Buscadores y SEO': 'https://images.pexels.com/photos/907607/pexels-photo-907607.jpeg?auto=compress&cs=tinysrgb&w=1200',
     '6- Entrega de la web, Puesta a punto y seguimiento mensual.': 'https://images.pexels.com/photos/3183172/pexels-photo-3183172.jpeg?auto=compress&cs=tinysrgb&w=1200'
@@ -328,13 +329,13 @@ function Hero({ onOpenOpciones, onOpenChat, onOpenBotGuide }) {
       <div aria-hidden="true" className="hero-overlay" />
       <div className="wrap" style={{ position: 'relative', zIndex: 1, paddingTop: 112, paddingBottom: 80 }}>
         <span className="badge">En la cúspide de la tecnología</span>
-        <h1 className="neon" style={{ fontSize: 'clamp(32px,6vw,56px)', fontWeight: 800, letterSpacing: 0.2, marginTop: 12 }}>Creamos software inteligente que impulsa tu negocio.</h1>
-        <p style={{ marginTop: 12, color: 'var(--text-muted)', maxWidth: 720, fontSize: 19 }}>Desarrollo Web, Apps Android y Automatizaciones con IA. SEO, analítica y performance listos desde el día uno.</p>
+        <h1 className="neon" style={{ fontSize: 'clamp(32px,6vw,56px)', fontWeight: 800, letterSpacing: 0.2, marginTop: 12, color: 'var(--accent)' }}>Creamos software inteligente que impulsa tu negocio.</h1>
+        <p style={{ marginTop: 12, color: 'var(--accent)', maxWidth: 720, fontSize: 19, fontWeight: 500 }}>Desarrollo Web, Apps Android y Automatizaciones con IA. SEO, analítica y performance listos desde el día uno.</p>
         <div style={{ marginTop: 24, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-          <a href={wa} className="btn btn-accent glow"><IcoWhatsApp /> WhatsApp</a>
-          <button onClick={onOpenOpciones} className="btn btn-ghost"><IcoOptions /> Opciones de Desarrollo</button>
-          <button onClick={onOpenChat} className="btn btn-ghost"><IcoChat /> Chat bot</button>
-          <button onClick={onOpenBotGuide} className="btn btn-ghost">Configurar mi bot</button>
+          <a href={wa} className="btn btn-accent glow" style={{ color: 'var(--ink-on-accent)' }}><IcoWhatsApp /> WhatsApp</a>
+          <button onClick={onOpenOpciones} className="btn btn-ghost" style={{ color: 'var(--accent)', borderColor: 'rgba(var(--accent-rgb),0.45)' }}><IcoOptions /> Opciones de Desarrollo</button>
+          <button onClick={onOpenChat} className="btn btn-ghost" style={{ color: 'var(--accent)', borderColor: 'rgba(var(--accent-rgb),0.45)' }}><IcoChat /> Chat bot</button>
+          <button onClick={onOpenBotGuide} className="btn btn-ghost" style={{ color: 'var(--accent)', borderColor: 'rgba(var(--accent-rgb),0.45)' }}>Configurar mi bot</button>
         </div>
       </div>
     </section>
@@ -442,11 +443,6 @@ function BotSetupGuide() {
       detail: 'Configuramos la plataforma (GPT/Dialogflow/Botpress), integramos con tu CRM o Sheets, probamos con tu equipo y dejamos tableros de métricas listos.'
     }
   ];
-  const extras = [
-    'Checklist editable para que cargues textos y FAQs.',
-    'Plantilla de guion de conversación (Google Docs).',
-    'Tablero inicial en Sheets para medir leads y derivaciones.'
-  ];
   const pics = imageAssets.botGuide;
   return (
     <section id="bot-guide" className="wrap" style={{ paddingTop: 64, paddingBottom: 64 }}>
@@ -464,12 +460,6 @@ function BotSetupGuide() {
             </div>
           </article>
         ))}
-      </div>
-      <div className="panel glow" style={{ marginTop: 24, padding: 20 }}>
-        <h3 style={{ fontWeight: 700 }}>¿Qué te damos para empezar hoy?</h3>
-        <ul style={{ marginTop: 12, display: 'grid', gap: 8 }}>
-          {extras.map((item, idx) => (<li key={idx} style={{ color: 'var(--text-muted)' }}>• {item}</li>))}
-        </ul>
       </div>
     </section>
   );
@@ -500,15 +490,15 @@ function Marketing() {
             style={{
               padding: '14px 18px',
               borderRadius: 14,
-              background: `linear-gradient(135deg, ${l.color} 0%, ${l.color}aa 100%)`,
-              border: 'none',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
               boxShadow: '0 12px 30px rgba(0,0,0,0.25)'
             }}
           >
             <img
               alt={l.alt}
               src={l.src}
-              style={{ width: 56, height: 56, objectFit: 'contain', display: 'block', filter: 'invert(1)' }}
+              style={{ width: 56, height: 56, objectFit: 'contain', display: 'block' }}
               loading="lazy"
             />
           </div>
