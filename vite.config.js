@@ -6,6 +6,6 @@ export default defineConfig({
   base: '/Ranquel/',
   build: {
     outDir: 'docs',
-    emptyOutDir: true
+    emptyOutDir: false
   }
 });
