@@ -1,1 +1,15 @@
-404: Not Found
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title>Microsoft Advertising</title>
+  <defs>
+    <linearGradient id="madvOuter" x1="12%" y1="0%" x2="88%" y2="100%">
+      <stop offset="0%" stop-color="#5CE0FF" />
+      <stop offset="100%" stop-color="#0078D4" />
+    </linearGradient>
+    <linearGradient id="madvInner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D9F7FF" />
+      <stop offset="100%" stop-color="#38B8FF" />
+    </linearGradient>
+  </defs>
+  <path fill="url(#madvOuter)" d="M144 12h76.6a4 4 0 0 1 3.8 5.2L143.7 244.4c-2.6 6.5-12 6.5-14.6 0L31.6 17.2A4 4 0 0 1 35.4 12H112l48 150.6L144 12Z" />
+  <path fill="url(#madvInner)" d="M128 192.4 95.6 90.2H58.3a4 4 0 0 0-3.8 5.2l61.7 169.1c1.8 4.8 7.9 4.8 9.7 0l28.1-76.1Z" opacity=".92" />
+</svg>
